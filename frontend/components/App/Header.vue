@@ -16,7 +16,7 @@ function toggleTheme() {
       class="bg-bkg-primary flex justify-between items-center shadow dark:shadow-black py-3 rounded"
     >
       <div class="w-10 h-10 rounded-full ml-6">
-        <img src="~/assets/img/logo.png" alt="logo" class="w-full" />
+        <img src="/img/logo.png" alt="logo" class="w-full" />
       </div>
       <div class="flex gap-12 pl-20">
           <UFormGroup label="Kids" size="xl"></UFormGroup>
@@ -32,7 +32,7 @@ function toggleTheme() {
           @click="toggleTheme"
           class="transition-transform duration-300 hover:rotate-[360deg]"
         />
-        <UButton label="Register" color="gray" />
+        <UButton label="Register" color="gray" to="/auth/register" />
         <UButton label="Login" color="black" to="/auth/login" />
       </div>
     </div>

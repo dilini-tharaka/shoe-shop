@@ -9,6 +9,11 @@ export default defineAppConfig({
     },
     icons: {
       dynamic: true
+    },
+    input: {
+      default: {
+        size: "lg",
+      }
     }
   },
 });

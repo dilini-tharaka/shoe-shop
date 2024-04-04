@@ -1,20 +1,34 @@
 <template>
-  <div
-    class="w-full min-h-20 bg-bkg-primary flex rounded justify-between items-center"
-  >
-    <div class="flex">
-      <img src="~/assets/img/logo.png" alt="logo" class="w-16 rounded-full" />
-    </div>
+  <div class="w-full px-5">
+    <div
+      class="bg-bkg-primary flex rounded justify-between items-center h-24 shadow dark:shadow-black px-3"
+    >
+      <div class="flex justify-center">
+        <img src="/img/logo.png" alt="logo" class="w-2/5" />
+      </div>
 
-    <div class="flex flex-col p-2">
-      <h1 class="text-xl font-bold">Location</h1>
-      <p class="text-sm">No.10/A, Makola Road,</p>
-      <p class="text-sm">Sapugaskanda</p>
-    </div>
+      <div class="flex flex-col">
+        <h1 class="text-xl font-bold">Location</h1>
+        <p class="text-sm">No.10/A, Makola Road,</p>
+        <p class="text-sm">Sapugaskanda</p>
+      </div>
 
-    <div class="flex flex-col p-2">
-      <h1 class="text-xl font-bold">Contact Us</h1>
-      <p class="text-sm">+94 77 310 7099</p>
+      <div class="flex flex-col">
+        <h1 class="text-xl font-bold">Contact Us</h1>
+        <div class="flex p-1 gap-1">
+          <UIcon name="solar:call-chat-rounded-bold" class="text-xl"/>
+          <p class="text-sm">+94 77 310 7099</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col pr-11">
+        <h1 class="text-xl font-bold">Follow Us</h1>
+        <UButton
+          variant="ghost"
+          icon="akar-icons:facebook-fill"
+          color="black"
+        />
+      </div>
     </div>
   </div>
 </template>
