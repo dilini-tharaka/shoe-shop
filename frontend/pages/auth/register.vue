@@ -38,7 +38,6 @@ function register() {
               <UFormGroup label="First Name" name="firstName">
                 <UInput
                   v-model="form.firstName"
-                  icon="solar:user-bold"
                   class="pr-2"
                 />
               </UFormGroup>
@@ -47,14 +46,13 @@ function register() {
               <UFormGroup label="Last Name" name="lastName">
                 <UInput
                   v-model="form.lastName"
-                  icon="solar:user-bold"
                   class="pl-2"
                 />
               </UFormGroup>
             </div>
           </div>
           <UFormGroup label="Email Address" name="email">
-            <UInput v-model="form.email" icon="solar:user-bold" />
+            <UInput v-model="form.email" icon="solar:letter-bold" />
           </UFormGroup>
 
           <UFormGroup label="Password" name="password">

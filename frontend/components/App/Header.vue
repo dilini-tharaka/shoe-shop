@@ -19,10 +19,40 @@ function toggleTheme() {
         <img src="/img/logo.png" alt="logo" class="w-full" />
       </div>
       <div class="flex gap-12 pl-20">
-          <UFormGroup label="Kids" size="xl"></UFormGroup>
-          <UFormGroup label="Men" size="xl"></UFormGroup>
-          <UFormGroup label="Women" size="xl"></UFormGroup>
-          <UFormGroup label="Sports" size="xl"></UFormGroup>
+        <ULink
+          to="/Dashboard"
+          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Kids
+        </ULink>
+
+        <ULink
+          to="/auth/login"
+          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Men
+        </ULink>
+
+        <ULink
+          to="/auth/login"
+          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Women
+        </ULink>
+        <ULink
+          to="/auth/login"
+          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Sports
+        </ULink>
       </div>
       <div class="flex gap-3 px-5">
         <UButton
