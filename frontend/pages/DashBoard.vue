@@ -75,7 +75,7 @@ function showMenu() {
         >
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >Home</ULink
@@ -84,7 +84,7 @@ function showMenu() {
 
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >Stocks</ULink
@@ -93,7 +93,7 @@ function showMenu() {
 
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >Products</ULink
@@ -102,7 +102,7 @@ function showMenu() {
 
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >Suppliers</ULink
@@ -111,7 +111,7 @@ function showMenu() {
 
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >Users</ULink
@@ -120,7 +120,7 @@ function showMenu() {
 
           <ULink
             to="/"
-            class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+            class="hover:text-primary text-lg font-mono"
             active-class="text-primary"
             inactive-class="text-secondary"
             >POS</ULink

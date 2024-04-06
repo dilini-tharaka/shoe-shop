@@ -1,4 +1,6 @@
 <script setup>
+import { addProductSchema } from "~/schema";
+
 const filterOption = ["Filter Option", "Brand", "Color", "Size", "ID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
@@ -39,8 +41,39 @@ const rows = computed(() => {
   return shoes.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
+const brands = [
+  { value: "Nike", label: "Nike" },
+  { value: "Adidas", label: "Adidas" },
+  { value: "Vans", label: "Vans" },
+  { value: "Converse", label: "Converse" },
+  { value: "Puma", label: "Puma" },
+  { value: "Reebok", label: "Reebok" },
+];
+
+const selectedBrand = ref("");
+
 function search() {
   console.log("Search");
+}
+
+function addSize() {
+  console.log("Add Size");
+}
+
+function addColor() {
+  console.log("Add Color");
+}
+
+function addBrand() {
+  console.log("Add Brand");
+}
+
+function addName() {
+  console.log("Add Name");
+}
+
+function addProduct() {
+  console.log("Submit");
 }
 </script>
 
@@ -75,14 +108,77 @@ function search() {
       </div>
     </div>
 
-    <div class="w-full flex flex-col">
-      <div class=" pl-3">
-        <h1 class="text-lg font-mono font-bold">Add Product</h1>
-      </div>
+    <div class="w-full flex flex-col px-3 pb-3">
+      <UForm :schema="addProductSchema" :state="state" @submit="addProduct">
+        <div class="">
+          <h1 class="text-lg font-mono font-bold">Add Product</h1>
+        </div>
 
-      <div class="">
-        mxzcxc
-      </div>
+        <div class="flex flex-row gap-16 items-center">
+          <UFormGroup label="ID:">
+            <UBadge color="primary" variant="soft">182393</UBadge>
+          </UFormGroup>
+
+          <div class="flex justify-center items-center">
+            <UFormGroup label="Size:">
+              <UInput />
+            </UFormGroup>
+
+            <UButton
+              icon="solar:add-circle-broken"
+              size="sm"
+              color="primary"
+              variant="ghost"
+              @click="addSize"
+            />
+          </div>
+          <div class="flex justify-center items-center">
+            <UFormGroup label="Color:">
+              <UInput />
+            </UFormGroup>
+            <UButton
+              icon="solar:add-circle-broken"
+              size="sm"
+              color="primary"
+              variant="ghost"
+              @click="addColor"
+            />
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-4 py-3">
+          <label for="">Brands:</label>
+          <URadio
+            v-for="brand of brands"
+            :key="brand.value"
+            v-model="selectedBrand"
+            v-bind="brand"
+          />
+          <UButton
+            icon="solar:add-circle-broken"
+            size="sm"
+            color="primary"
+            variant="ghost"
+            @click="addBrand"
+          />
+        </div>
+        <div class="w-full flex flex-row items-center gap-2">
+          <UFormGroup label="Name:">
+            <UInput />
+          </UFormGroup>
+
+          <UButton
+            icon="solar:add-circle-broken"
+            size="sm"
+            color="primary"
+            variant="ghost"
+            @click="addName"
+          />
+          <div class="flex justify-center gap-6">
+            <UButton type="submit" class="my-5">Add a Product</UButton>
+            <UButton type="" class="my-5" color="black">Cancel</UButton>
+          </div>
+        </div>
+      </UForm>
     </div>
   </div>
 </template>
