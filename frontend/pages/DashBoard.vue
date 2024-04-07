@@ -62,7 +62,7 @@ function showMenu() {
           />
 
           <div class="flex flex-col px-2">
-            <span class="text-sm">Hi! Jhon,</span>
+            <span class="text-sm">Hi! Dilini,</span>
             <span class="text-sm">Welcome back</span>
           </div>
         </div>

@@ -50,7 +50,14 @@ const brands = [
   { value: "Reebok", label: "Reebok" },
 ];
 
-const selectedBrand = ref("");
+const state = reactive({
+  size: "",
+  color: "",
+  brand: "",
+  name: "",
+});
+
+const isOpen = ref(false);
 
 function search() {
   console.log("Search");
@@ -121,7 +128,7 @@ function addProduct() {
 
           <div class="flex justify-center items-center">
             <UFormGroup label="Size:">
-              <UInput />
+              <UInput v-model="state.size" />
             </UFormGroup>
 
             <UButton
@@ -129,12 +136,15 @@ function addProduct() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="addSize"
+              @click="isOpen = true"
             />
+            <USlideover v-model="isOpen">
+              <AppAddSize />
+            </USlideover>
           </div>
           <div class="flex justify-center items-center">
             <UFormGroup label="Color:">
-              <UInput />
+              <UInput v-model="state.color" />
             </UFormGroup>
             <UButton
               icon="solar:add-circle-broken"
@@ -150,7 +160,7 @@ function addProduct() {
           <URadio
             v-for="brand of brands"
             :key="brand.value"
-            v-model="selectedBrand"
+            v-model="state.brand"
             v-bind="brand"
           />
           <UButton
@@ -163,7 +173,7 @@ function addProduct() {
         </div>
         <div class="w-full flex flex-row items-center gap-2">
           <UFormGroup label="Name:">
-            <UInput />
+            <UInput v-model="state.name" />
           </UFormGroup>
 
           <UButton
