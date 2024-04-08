@@ -1,3 +1,7 @@
 export * from './login.schema'
 export * from './register.schema'
 export * from './addProduct.schema'
+export * from './addSize.schema'
+export * from './addColor.schema'
+export * from './addBrand.schema'
+export * from './addName.schema'    

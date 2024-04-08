@@ -10,7 +10,7 @@ const shoes = [
     id: 1,
     brand: "Nike",
     name: "Nike Air Max",
-    price: 200,
+    currentPrice: 200,
     color: "black",
     size: 10,
   },
@@ -19,7 +19,7 @@ const shoes = [
     id: 2,
     brand: "Adidas",
     name: "Adidas Superstar",
-    price: 150,
+    currentPrice: 150,
     color: "white",
     size: 10,
   },
@@ -28,7 +28,7 @@ const shoes = [
     id: 3,
     brand: "Vans",
     name: "Vans Old Skool",
-    price: 100,
+    currentPrice: 100,
     color: "grey",
     size: 10,
   },
@@ -41,6 +41,7 @@ const rows = computed(() => {
   return shoes.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
+// Add Product using radio button
 const brands = [
   { value: "Nike", label: "Nike" },
   { value: "Adidas", label: "Adidas" },
@@ -50,29 +51,21 @@ const brands = [
   { value: "Reebok", label: "Reebok" },
 ];
 
-const state = reactive({
+const state = ref({
   size: "",
   color: "",
   brand: "",
   name: "",
 });
 
-const isOpen = ref(false);
+// Slideover
+const isSize = ref(false);
+const isColor = ref(false);
+const isBrand = ref(false);
+const isName = ref(false);
 
 function search() {
   console.log("Search");
-}
-
-function addSize() {
-  console.log("Add Size");
-}
-
-function addColor() {
-  console.log("Add Color");
-}
-
-function addBrand() {
-  console.log("Add Brand");
 }
 
 function addName() {
@@ -127,7 +120,7 @@ function addProduct() {
           </UFormGroup>
 
           <div class="flex justify-center items-center">
-            <UFormGroup label="Size:">
+            <UFormGroup label="Size:" name="size">
               <UInput v-model="state.size" />
             </UFormGroup>
 
@@ -136,14 +129,14 @@ function addProduct() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="isOpen = true"
+              @click="isSize = true"
             />
-            <USlideover v-model="isOpen">
+            <USlideover v-model="isSize">
               <AppAddSize />
             </USlideover>
           </div>
           <div class="flex justify-center items-center">
-            <UFormGroup label="Color:">
+            <UFormGroup label="Color:" name="color">
               <UInput v-model="state.color" />
             </UFormGroup>
             <UButton
@@ -151,12 +144,16 @@ function addProduct() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="addColor"
+              @click="isColor = true"
             />
+
+            <USlideover v-model="isColor">
+              <AppAddColor/>
+            </USlideover>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-4 py-3">
-          <label for="">Brands:</label>
+          <label for="brand">Brands:</label>
           <URadio
             v-for="brand of brands"
             :key="brand.value"
@@ -168,11 +165,14 @@ function addProduct() {
             size="sm"
             color="primary"
             variant="ghost"
-            @click="addBrand"
+            @click="isBrand = true"
           />
+          <USlideover v-model="isBrand">
+              <AppAddBrand/>
+            </USlideover>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <UFormGroup label="Name:">
+          <UFormGroup label="Name:" name="name">
             <UInput v-model="state.name" />
           </UFormGroup>
 
@@ -181,9 +181,12 @@ function addProduct() {
             size="sm"
             color="primary"
             variant="ghost"
-            @click="addName"
+            @click="isName = true"
           />
-          <div class="flex justify-center gap-6">
+          <USlideover v-model="isName">
+              <AppAddName/>
+            </USlideover>
+          <div class="flex justify-center gap-6 px-2">
             <UButton type="submit" class="my-5">Add a Product</UButton>
             <UButton type="" class="my-5" color="black">Cancel</UButton>
           </div>
