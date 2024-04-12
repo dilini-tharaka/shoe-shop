@@ -1,6 +1,7 @@
 <script setup>
 import { addProductSchema } from "~/schema";
 
+// Filter
 const filterOption = ["Filter Option", "Brand", "Color", "Size", "ID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
