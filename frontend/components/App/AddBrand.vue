@@ -1,5 +1,5 @@
 <script setup>
-import { addBrandSchema } from "~/schema";
+import {  } from "~/schema";
 
 const from = ref({
   brand: "",
@@ -12,7 +12,7 @@ function onSubmit() {
 
 <template>
   <UForm
-    :schema="addBrandSchema"
+    
     :state="from"
     @submit="onSubmit"
     class="p-4 flex-1 flex flex-col gap-5"

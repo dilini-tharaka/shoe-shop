@@ -63,7 +63,7 @@ function register() {
             />
           </UFormGroup>
 
-          <div class="flex px-10">
+          <div class="flex flex-col gap-2 px-10">
             <UButton
               type="submit"
               class="w-full"
@@ -72,6 +72,8 @@ function register() {
             >
               Register
             </UButton>
+          <UButton to= "/" variant="outline"block>Cancel</UButton>
+
           </div>
         </UForm>
         <div class="flex justify-center">

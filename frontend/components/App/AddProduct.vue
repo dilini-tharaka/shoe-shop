@@ -6,6 +6,36 @@ const filterOption = ["Filter Option", "Brand", "Color", "Size", "ID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
+const columns = [
+  {
+    key: "id",
+    label: "ID",
+  },
+  {
+    key: "brand",
+    label: "Brand",
+  },
+  {
+    key: "name",
+    label: "Name",
+  },
+  {
+    key: "currentPrice",
+    label: "Current Price",
+  },
+  {
+    key: "color",
+    label: "Color",
+  },
+  {
+    key: "size",
+    label: "Size",
+  },
+  {
+    key: "actions",
+  },
+];
+
 const shoes = [
   {
     id: 1,
@@ -33,6 +63,26 @@ const shoes = [
     color: "grey",
     size: 10,
   },
+];
+
+const items = (row) => [
+  [
+    {
+      label: "Edit",
+      icon: "solar:gallery-edit-line-duotone",
+      click: () => console.log("Edit", row.id),
+    },
+    {
+      label: "More Info",
+      icon: "solar:info-circle-broken",
+    },
+  ],
+  [
+    {
+      label: "Delete",
+      icon: "solar:clipboard-remove-broken",
+    },
+  ],
 ];
 
 const page = ref(1);
@@ -76,6 +126,10 @@ function addName() {
 function addProduct() {
   console.log("Submit");
 }
+
+function clean() {
+  console.log("cancel clicking");
+}
 </script>
 
 <template>
@@ -96,8 +150,17 @@ function addProduct() {
       />
     </div>
     <div class="px-3">
-      <UTable :rows="rows" />
-
+      <UTable :rows="rows" :columns="columns">
+        <template #actions-data="{ row }">
+          <UDropdown :items="items(row)">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
+            />
+          </UDropdown>
+        </template>
+      </UTable>
       <div
         class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
       >
@@ -149,7 +212,7 @@ function addProduct() {
             />
 
             <USlideover v-model="isColor">
-              <AppAddColor/>
+              <AppAddColor />
             </USlideover>
           </div>
         </div>
@@ -169,8 +232,8 @@ function addProduct() {
             @click="isBrand = true"
           />
           <USlideover v-model="isBrand">
-              <AppAddBrand/>
-            </USlideover>
+            <AppAddBrand />
+          </USlideover>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
           <UFormGroup label="Name:" name="name">
@@ -185,11 +248,11 @@ function addProduct() {
             @click="isName = true"
           />
           <USlideover v-model="isName">
-              <AppAddName/>
-            </USlideover>
+            <AppAddName />
+          </USlideover>
           <div class="flex justify-center gap-6 px-2">
             <UButton type="submit" class="my-5">Add a Product</UButton>
-            <UButton type="" class="my-5" color="black">Cancel</UButton>
+            <UButton class="my-5" color="black" @click="clean">Cancel</UButton>
           </div>
         </div>
       </UForm>

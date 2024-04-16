@@ -15,13 +15,13 @@ function toggleTheme() {
     <div
       class="bg-bkg-primary flex justify-between items-center shadow dark:shadow-black py-3 rounded"
     >
-      <div class="w-10 h-10 rounded-full ml-6">
-        <img src="/img/logo.png" alt="logo" class="w-full" />
+      <div class="hidden lg:flex w-[10%] rounded-full ml-6">
+        <img src="/img/logo.png" alt="logo" class="w-2/5" />
       </div>
-      <div class="flex gap-12 pl-20">
+      <div class="flex lg:w-full gap-5 lg:gap-12 pl-4 lg:pl-20">
         <ULink
           to="/Dashboard"
-          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
@@ -30,7 +30,7 @@ function toggleTheme() {
 
         <ULink
           to="/auth/login"
-          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
@@ -39,7 +39,7 @@ function toggleTheme() {
 
         <ULink
           to="/auth/login"
-          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
@@ -47,7 +47,7 @@ function toggleTheme() {
         </ULink>
         <ULink
           to="/auth/login"
-          class="transition-colors duration-300 hover:text-primary text-lg font-mono"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
@@ -60,7 +60,7 @@ function toggleTheme() {
           :icon="themeIcon"
           color="black"
           @click="toggleTheme"
-          class="transition-transform duration-300 hover:rotate-[360deg]"
+          class="hidden lg:flex transition-transform duration-300 hover:rotate-[360deg]"
         />
         <UButton label="Register" color="gray" to="/auth/register" />
         <UButton label="Login" color="black" to="/auth/login" />

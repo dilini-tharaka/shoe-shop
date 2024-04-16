@@ -65,7 +65,8 @@ function login() {
             </ULink>
           </div>
 
-          <UButton type="submit" class="my-5" block>Login</UButton>
+          <UButton type="submit" class="mt-5" block>Login</UButton>
+          <UButton to= "/" variant="outline"block>Cancel</UButton>
         </UForm>
 
         <div class="flex justify-center py-5">

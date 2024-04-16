@@ -129,7 +129,7 @@ function showMenu() {
         </div>
 
         <div class="w-full lg:w-5/6 bg-bkg-primary flex rounded ml-1">
-          <AppAddUser />
+          <AppAddProduct/>
         </div>
       </div>
     </div>
