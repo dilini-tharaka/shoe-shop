@@ -1,5 +1,5 @@
 <script setup>
-import { addUserSchema } from "~/schema";
+import { addSupplierSchema } from "~/schema";
 // Search Filter
 const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
 const selected = ref(filterOption[0]);
@@ -86,19 +86,40 @@ const rows = computed(() => {
   return Suppliers.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
+//select menu for district
+const district = ["Colombo", "Gampaha", "Kalutara", "Kandy", "Galle"];
+
+//checkbox for available brands
+const checkedBrands = ref([]);
+
+//slideover for add brand
+const isBrand = ref(false);
+
+//select menu for bank name
+const bankName = ["BOC", "Sampath","Peoples"];
+
 const form = ref({
-  firstName: "",
-  lastName: "",
-  nic: "",
-  mobile: 0,
+  name: "",
+  mobile: "",
   email: "",
-  selectedRole: "",
-  userName: "",
-  password: "",
+  address: "",
+  selectedDistrict: district[0],
+  selectedBank: bankName[0],
+  accountHolderName: "",
+  accountNumber: "",
+  branch: "",
 });
 
 function search() {
   console.log("Search");
+}
+
+function check() {
+  console.log(checkedBrands.value);
+}
+
+function addSupplier() {
+  console.log(form.value);
 }
 </script>
 
@@ -142,55 +163,93 @@ function search() {
         />
       </div>
     </div>
-    <div class="w-full flex flex-col px-3 pb-3">
-      <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
-      <UForm :schema="addUserSchema" :state="form" @submit="addUser">
-        <div class="flex flex-row gap-16 items-center px-2">
-          <UFormGroup label="First Name" name="firstName">
-            <UInput v-model="form.firstName" />
+    <div class="w-full flex flex-col gap-2">
+      <div class="flex gap-5">
+        <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
+        <h1>ID</h1>
+        <UBadge color="primary" variant="outline" size="xs">458</UBadge>
+      </div>
+      <UForm :schema="addSupplierSchema" :state="form" @submit="addSupplier">
+        <div class="w-full flex flex-row gap-16 items-center">
+          <UFormGroup label="Name" name="name">
+            <UInput v-model="form.name" />
           </UFormGroup>
 
-          <UFormGroup label="Last Name" name="lastName">
-            <UInput v-model="form.lastName" />
-          </UFormGroup>
-
-          <UFormGroup label="NIC" name="nic">
-            <UInput v-model="form.nic" />
-          </UFormGroup>
-        </div>
-
-        <div class="flex flex-row gap-16 items-center p-2">
           <UFormGroup label="Mobile" name="mobile">
-            <UInput v-model="form.mobile" />
+            <UInput placeholder="07########" v-model="form.mobile" />
           </UFormGroup>
 
-          <UFormGroup label="Email" class="w-2/5" name="email">
+          <UFormGroup label="Email" name="email" class="w-1/2">
             <UInput v-model="form.email" />
           </UFormGroup>
         </div>
 
-        <div class="flex flex-row gap-16 items-center p-2">
-          <UFormGroup label="Role" class="w-2/12" name="role">
+        <div class="flex flex-row gap-16 items-center py-2">
+          <UFormGroup label="Address" class="w-3/4" name="address">
+            <UInput v-model="form.address" />
+          </UFormGroup>
+
+          <UFormGroup label="District" class="w-1/4" name="selectedDistrict">
             <USelectMenu
               color="primary"
-              :options="roleFilter"
-              v-model="form.selectedRole"
+              :options="district"
+              v-model="form.selectedDistrict"
             />
           </UFormGroup>
+        </div>
 
-          <UFormGroup label="User Name" name="userName">
-            <UInput v-model="form.userName" />
-          </UFormGroup>
+        <div class="flex flex-row flex-wrap gap-10 items-center">
+          <h1>Available Brands</h1>
 
-          <UFormGroup label="Password" name="password">
-            <UInput v-model="form.password" />
-          </UFormGroup>
-          <div class="flex flex-wrap items-center gap-2 w-2/5">
-            <UButton type="submit" color="primary" variant="solid" block
-              >Add Supplier</UButton
-            >
-            <UButton color="gray" variant="solid" block>Cancel</UButton>
+          <UCheckbox v-model="checkedBrands" value="addidas" label="Addidas" />
+
+          <UCheckbox v-model="checkedBrands" value="nike" label="Nike" />
+
+          <UCheckbox v-model="checkedBrands" value="puma" label="Puma" />
+
+          <UCheckbox v-model="checkedBrands" value="reebok" label="Reebok" />
+          <UButton
+            icon="solar:add-circle-broken"
+            size="sm"
+            color="primary"
+            variant="ghost"
+            @click="isBrand = true"
+          />
+          <USlideover v-model="isBrand">
+            <AppAddBrand />
+          </USlideover>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="font-bold">Bank Details</h1>
+          <div class="w-full flex flex-row gap-5 items-center">
+            <UFormGroup label="Account Owner's Name" class="w-1/5" name="accountHolderName">
+              <UInput v-model="form.accountHolderName" />
+            </UFormGroup>
+
+            <UFormGroup label="Bank Name" class="w-1/5" name="selectedBank">
+              <USelectMenu
+                color="primary"
+                :options="bankName"
+                v-model="form.selectedBank"
+              />
+            </UFormGroup>
+
+            <UFormGroup label="Account Number" class="w-1/4" name="accountNumber">
+              <UInput v-model="form.accountNumber"/>
+            </UFormGroup>
+
+            <UFormGroup label="Branch" class="w-1/5" name="branch">
+              <UInput v-model="form.branch"/>
+            </UFormGroup>
           </div>
+        </div>
+        <div class="w-1/2 flex items-center gap-2  pt-4">
+          <UButton type="submit" color="primary" variant="solid" block
+            >Add Supplier</UButton
+          >
+          <UButton color="gray" variant="solid"  @click="check" block
+            >Cancel</UButton
+          >
         </div>
       </UForm>
     </div>
