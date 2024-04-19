@@ -1,12 +1,15 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
-<div>
+  <div>
     <NuxtLayout name="e-commerce">
-<div class="w-full h-screen bg-bkg-primary rounded-lg shadow dark:shadow-black overflow-hidden">
-
-</div>
+      <div class="w-full h-screen rounded-lg shadow dark:shadow-black">
+        <template>
+          <div class="w-full h-full bg-[url(/img/login.png)] bg-center bg-cover">
+            
+          </div>
+        </template>
+      </div>
     </NuxtLayout>
-</div>
+  </div>
 </template>
