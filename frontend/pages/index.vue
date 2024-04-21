@@ -2,7 +2,7 @@
 
 <template>
   <div class="w-full h-screen bg-bkg-secondary flex flex-col">
-    <main class="flex flex-col gap-3 items-center justify-center">
+    <main class="flex flex-col gap-3">
       <AppProductCard />
     </main>
   </div>
