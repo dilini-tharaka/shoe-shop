@@ -6,7 +6,7 @@
   </header>
 
   <main class="w-full bg-bkg-secondary flex flex-1 flex-col">
-    <div class="w-full h-[500px] overflow-hidden">
+    <div class="w-full h-[500px] bg-bkg-primary overflow-hidden">
       <slot name="hero"/>
     </div>
     <div class="p-3">
