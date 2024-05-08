@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "serve": "node --watch ./src/index.js"
+    "serve": "node --watch ./src/index.js",
+    "start": "bun --watch ./src/index.js"
   },
   "keywords": [],
   "author": "",
