@@ -14,8 +14,10 @@ app.get("/", (req, res) => {
 //middlewares
 app.use(express.json());
 app.use("/login",ROUTE.Login);
+app.use("/register",ROUTE.Register);
 app.use("/product", ROUTE.Product);
 app.use("/user", ROUTE.User);
+app.use("/supplier", ROUTE.Supplier);
 
 app.listen(process.env.APP_PORT, () => {
   console.log(

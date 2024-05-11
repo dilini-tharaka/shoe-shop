@@ -1,6 +1,6 @@
 import express from "express";
 import Login from "../dtos/login";
-import User from "../modules/login";
+import User from "../modules/LoginController";
 
 const login = express.Router();
 const users: User[] = [];
