@@ -33,6 +33,24 @@ product.get("/:id", (req, res) => {
   res.send(product);
 });
 
+product.patch("/:id", (req, res) => {
+  const { name, brand, color, size } = req.body as Productdto;
+  const product = products.find(
+    (product) => product.id === parseInt(req.params.id)
+  );
+  if (!product) {
+    res.status(404).send("Product not found!");
+    return;
+  }
+
+  product.name = name ?? product.name;
+  product.brand = brand ?? product.brand;
+  product.color = color ?? product.color;
+  product.size = size ?? product.size;
+
+  res.json(product);
+});
+
 product.put("/:id", (req, res) => {
   const { name, brand, color, size } = req.body as Productdto;
   const product = products.find(
