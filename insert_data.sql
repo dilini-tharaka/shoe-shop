@@ -163,7 +163,7 @@ INSERT INTO `Product` (`Shoes_id`, `selling_count`, `Sizes_id`) VALUES
 -- -----------------------------------------------------
 -- Table `Stock`
 -- -----------------------------------------------------
-INSERT INTO `Stock` (`bought_at`, `stock_value`, `paid_amount`, `Supplier_id`, `StockManager_id`) VALUES 
+INSERT INTO `stock` (`bought_at`, `stock_value`, `paid_amount`, `Supplier_id`, `StockManager_id`) VALUES 
 (NOW(), 500.00, 450.00, 1, 1),
 (NOW(), 600.00, 550.00, 2, 2),
 (NOW(), 700.00, 650.00, 3, 1);
@@ -183,15 +183,15 @@ INSERT INTO `StockDetails` (`qty`, `buying_price`, `selling_price`, `barcode`, `
 INSERT INTO `Orders` (`paid_amount`, `ordered_at`, `ordered_by`, `ordered_from`) VALUES 
 (300.00, NOW(), 1, 1),
 (400.00, NOW(), 2, 2),
-(500.00, NOW(), 3, 3);
+(500.00, NOW(), 2, 3);
 
 -- -----------------------------------------------------
 -- Table `OrderDetails`
 -- -----------------------------------------------------
 INSERT INTO `OrderDetails` (`qty`, `Orders_id`, `Product_id`) VALUES 
-(50, 1, 1),
-(100, 2, 2),
-(150, 3, 3);
+(50, 19, 1),
+(100, 20, 2),
+(150, 21, 3);
 
 -- -----------------------------------------------------
 -- Table `Images`
@@ -208,16 +208,16 @@ INSERT INTO `Images` (`path`, `Product_id`) VALUES
 -- -----------------------------------------------------
 INSERT INTO `Invoice` (`Invoice_at`, `Cashier_id`) VALUES 
 (NOW(), 1),
-(NOW(), 2), 
-(NOW(), 3);
+(NOW(), 1), 
+(NOW(), 1);
 
 -- -----------------------------------------------------
 -- Table `InvoiceItem`
 -- -----------------------------------------------------
 INSERT INTO `InvoiceItem` (`qty`, `total`, `StockDetails_id`, `Invoice_id`) VALUES 
-(1, 10.00, 1, 1),
-(2, 24.00, 2, 2),
-(3, 42.00, 3, 3);   
+(1, 10.00, 1, 4),
+(2, 24.00, 2, 5),
+(3, 42.00, 3, 6);   
 
 -- -----------------------------------------------------
 -- Table `SupplierhasBrands`
