@@ -11,7 +11,7 @@ INSERT INTO Role (name) VALUES
 ('Customer');
 
 -- -----------------------------------------------------
--- Table `User`
+-- Tauserble `User`
 -- -----------------------------------------------------
 INSERT INTO User (`name`, `mobile`, `nic`, `email`, `userName`, `password`, `last_active`, `created_at`, `deleted_at`, `role_id`) VALUES 
 ('John Doe', '1234567890', 'NIC123456', 'john@example.com', 'john', 'password123', NULL, NOW(), NULL, 1),
@@ -226,3 +226,26 @@ INSERT INTO `SupplierhasBrands` (`Brand_id`, `Supplier_id`) VALUES
 (1, 1),
 (2, 2),
 (3, 3);
+
+
+-- inner join for product table
+-- Use `shoe-palace-db`;
+
+-- SELECT p.id,p.Shoes_id, p.Sizes_id,b.id,c.id,colors.id,p.selling_count,s.name,b.name,sz.length, sz.size,c.name,colors.name FROM product as p
+-- inner join shoes as s on
+-- p.Shoes_id = s.id
+-- inner join sizes as sz on
+-- p.Sizes_id = sz.id
+-- inner join brand as b on
+-- s.brand_id = b.id
+-- inner join shoeshascategory as shasc on
+-- s.id = shasc.Shoes_id
+-- inner join category as c on
+-- shasc.Category_id = c.id
+-- inner join shoeshascolors shasclo on
+-- shasclo.Shoes_id = s.id
+-- inner join colors on
+-- colors.id = shasclo.Colors_id
+
+
+
