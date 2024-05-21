@@ -1,7 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 
-const app = express();
 const prisma = new PrismaClient();
 
 const login = express.Router();
@@ -10,7 +9,7 @@ login.post("/", async (req, res) => {
   try {
     const user = await prisma.user.findMany({
       where: {
-        email: req.body.email,
+        userName: req.body.userName,
         password: req.body.password,
       },
     });

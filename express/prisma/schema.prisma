@@ -11,10 +11,10 @@ datasource db {
 model admin {
   id       Int    @id @default(autoincrement())
   name     String @db.VarChar(255)
-  email    String @db.VarChar(255)
-  nic      String @db.VarChar(20)
+  email    String @unique(map: "email_UNIQUE") @db.VarChar(255)
+  nic      String @unique(map: "nic_UNIQUE") @db.VarChar(20)
   mobile   String @db.VarChar(255)
-  username String @db.VarChar(45)
+  username String @unique(map: "username_UNIQUE") @db.VarChar(45)
   password String @db.VarChar(45)
 }
 
@@ -22,9 +22,9 @@ model assistant {
   id       Int    @id @default(autoincrement())
   name     String @db.VarChar(255)
   email    String @db.VarChar(255)
-  nic      String @db.VarChar(20)
+  nic      String @unique(map: "nic_UNIQUE") @db.VarChar(20)
   mobile   String @db.VarChar(11)
-  username String @db.VarChar(45)
+  username String @unique(map: "username_UNIQUE") @db.VarChar(45)
   password String @db.VarChar(45)
 }
 
@@ -71,7 +71,7 @@ model customer {
   id         Int        @id @default(autoincrement())
   firstName  String     @db.VarChar(45)
   lastName   String     @db.VarChar(45)
-  email      String     @db.VarChar(255)
+  email      String     @unique(map: "email_UNIQUE") @db.VarChar(255)
   password   String     @db.VarChar(45)
   created_at DateTime   @db.Timestamp(0)
   deleted_at DateTime?  @db.Timestamp(0)
@@ -169,12 +169,12 @@ model shoes {
 }
 
 model shoeshascategory {
+  id          Int      @id @default(autoincrement())
   Shoes_id    Int
   Category_id Int
   category    category @relation(fields: [Category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Shoes_has_Category_Category1")
   shoes       shoes    @relation(fields: [Shoes_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Shoes_has_Category_Shoes1")
 
-  @@id([Shoes_id, Category_id])
   @@index([Category_id], map: "fk_Shoes_has_Category_Category1_idx")
   @@index([Shoes_id], map: "fk_Shoes_has_Category_Shoes1_idx")
 }
@@ -232,10 +232,10 @@ model stockdetails {
 model stockmanager {
   id       Int      @id @default(autoincrement())
   name     String   @db.VarChar(255)
-  email    String   @db.VarChar(255)
-  nic      String   @db.VarChar(20)
+  email    String   @unique(map: "email_UNIQUE") @db.VarChar(255)
+  nic      String   @unique(map: "nic_UNIQUE") @db.VarChar(20)
   mobile   String   @db.VarChar(11)
-  userName String   @db.VarChar(45)
+  userName String   @unique(map: "userName_UNIQUE") @db.VarChar(45)
   password String   @db.VarChar(45)
   orders   orders[]
   stock    stock[]
@@ -244,7 +244,7 @@ model stockmanager {
 model supplier {
   id                Int                 @id @default(autoincrement())
   name              String              @db.VarChar(255)
-  email             String              @db.VarChar(255)
+  email             String              @unique(map: "email_UNIQUE") @db.VarChar(255)
   mobile            String              @db.VarChar(11)
   nic               String              @db.VarChar(20)
   address           String              @db.VarChar(255)
@@ -260,12 +260,12 @@ model supplier {
 }
 
 model supplierhasbrands {
+  id          Int      @id @default(autoincrement())
   Brand_id    Int
   Supplier_id Int
   brand       brand    @relation(fields: [Brand_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_SupplierhasBrands_Brand1")
   supplier    supplier @relation(fields: [Supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_SupplierhasBrands_Supplier1")
 
-  @@id([Brand_id, Supplier_id])
   @@index([Brand_id], map: "fk_SupplierhasBrands_Brand1_idx")
   @@index([Supplier_id], map: "fk_SupplierhasBrands_Supplier1_idx")
 }
