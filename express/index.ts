@@ -20,6 +20,7 @@ app.use("/register", Route.Register);
 app.use("/user", Route.User);
 app.use("/supplier", Route.Supplier);
 app.use("/product", Route.Product);
+app.use("/invoice", Route.Invoice);
 
 
 app.listen(3000, () => {

@@ -52,9 +52,17 @@ supplier.post("/", async (req, res) => {
         nic: req.body.nic,
         address: req.body.address,
         created_at: new Date(),
-        bankDetails_id: req.body.bankDetails_id,
+        bankdetails: {
+          create: {
+            bank_name: req.body.bankdetails.bank_name,
+            branch: req.body.bankdetails.branch,
+            account_no: req.body.bankdetails.account_no,
+            account_owner: req.body.bankdetails.account_owner,
+          },
+        },
       },
     });
+    console.log(req.body);
     res.json({
       message: "success",
       data: supplier,
@@ -81,7 +89,14 @@ supplier.patch("/:id", async (req, res) => {
         mobile: req.body.mobile,
         nic: req.body.nic,
         address: req.body.address,
-        bankDetails_id: req.body.bankDetails_id,
+        bankdetails: {
+          create: {
+            bank_name: req.body.bankdetails.bank_name,
+            branch: req.body.bankdetails.branch,
+            account_no: req.body.bankdetails.account_no,
+            account_owner: req.body.bankdetails.account_owner,
+          },
+        },
       },
     });
     res.json({
@@ -117,3 +132,19 @@ supplier.delete("/:id", async (req, res) => {
 });
 
 export const Supplier = supplier;
+
+
+// {
+//   "name": "Supplier Eight",
+//   "email": "supplier8@example.com",
+//   "mobile": "445578888",
+//   "nic": "NIC8886",
+//   "address": "88 Supplier St",
+ 
+//   "bankdetails": {
+//     "bank_name": "Bank A",
+//     "branch": "Branch A",
+//     "account_no": "1478952",
+//     "account_owner": "Mr 8"
+//   }
+// }
