@@ -5,16 +5,31 @@ const prisma = new PrismaClient();
 
 const login = express.Router();
 
+login.get("/", async (req, res) => {
+  const users = await prisma.user.findMany();
+  res.json({
+    message: "success",
+    data: users,
+  });
+});
+
+//For login
 login.post("/", async (req, res) => {
   try {
     const user = await prisma.user.findMany({
       where: {
-        userName: req.body.userName,
+        email: req.body.email,
         password: req.body.password,
       },
     });
+
+    if (user.length === 0) {
+      return res.json({
+        message: "Error! invalid username or password",
+      });
+    }
     res.json({
-      message: "success login",
+      message: "success",
       data: user,
     });
   } catch (error: any) {

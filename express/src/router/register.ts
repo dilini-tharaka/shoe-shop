@@ -27,6 +27,7 @@ register.post("/", async (req, res) => {
       message: "success",
       data: customer,
     });
+    console.log(customer);
   } catch (error: any) {
     res.json({
       message: "error",

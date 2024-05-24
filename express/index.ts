@@ -1,9 +1,13 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import * as Route from "./src/router/index";
+import cors from "cors";
 
 const app = express();
 const prisma = new PrismaClient();
+app.use(cors({
+  origin: "http://localhost:3000",
+}));
 
 app.get("/", async (req, res) => {
   const users = await prisma.customer.findMany();
@@ -23,7 +27,7 @@ app.use("/product", Route.Product);
 app.use("/invoice", Route.Invoice);
 
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.listen(8000, () => {
+  console.log("Server is running on port 8000");
 });
 

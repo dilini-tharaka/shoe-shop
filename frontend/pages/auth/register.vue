@@ -1,5 +1,8 @@
 <script setup>
 import { registerSchema } from "~/schema";
+useHead({
+  title: "Register| shoe shop",
+});
 
 const form = ref({
   firstName: "",
@@ -8,8 +11,38 @@ const form = ref({
   password: "",
 });
 
-function register() {
-  // Do something
+let btnDisabled = ref(false);
+
+async function register() {
+  btnDisabled.value = true;
+
+  const { data: register } = await useFetch("http://localhost:8000/register", {
+    method: "POST",
+    body: JSON.stringify(form.value),
+  });
+
+  console.log(register.value.data);
+  if (register.value.data && register.value.message === "success") {
+    alert(`Register success!
+    Your email is ${form.value.email}
+    Your password is ${form.value.password}
+    `);
+    return navigateTo("/auth/login");
+  }
+
+  if (register.value.message === "error") {
+    form.value = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    };
+
+    btnDisabled.value = false;
+    return alert(`Register failed!
+    Already have an account with this email
+    `);
+  }
 }
 </script>
 
@@ -36,18 +69,12 @@ function register() {
           <div class="flex flex-row">
             <div class="w-full lg:w-1/2">
               <UFormGroup label="First Name" name="firstName">
-                <UInput
-                  v-model="form.firstName"
-                  class="pr-2"
-                />
+                <UInput v-model="form.firstName" class="pr-2" />
               </UFormGroup>
             </div>
             <div class="w-full lg:w-1/2">
               <UFormGroup label="Last Name" name="lastName">
-                <UInput
-                  v-model="form.lastName"
-                  class="pl-2"
-                />
+                <UInput v-model="form.lastName" class="pl-2" />
               </UFormGroup>
             </div>
           </div>
@@ -69,11 +96,11 @@ function register() {
               class="w-full"
               color="primary"
               block
+              :disabled="btnDisabled"
             >
               Register
             </UButton>
-          <UButton to= "/" variant="outline"block>Cancel</UButton>
-
+            <UButton to="/" variant="outline" block>Cancel</UButton>
           </div>
         </UForm>
         <div class="flex justify-center">

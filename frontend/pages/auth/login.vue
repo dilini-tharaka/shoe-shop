@@ -11,8 +11,26 @@ const form = ref({
   password: "",
 });
 
-function login() {
-  // Do something
+async function login() {
+  const { data: user } = await useFetch("http://localhost:8000/login", {
+    method: "POST",
+    body: JSON.stringify(form.value),
+  });
+  console.log(user);
+
+  // if login success
+  // redirect to either dashboard or home page
+  if (user.value.data && user.value.message === "success") {
+    //save user data to local storage
+    localStorage.setItem("user", JSON.stringify(user.value.data));
+    return navigateTo("/app/ecommerce");
+  }
+  if(!user.value.data){
+    form.value.email = "";
+    form.value.password = "";
+    // show error message
+    return alert("Invalid email or password ");
+  }
 }
 </script>
 
@@ -66,7 +84,7 @@ function login() {
           </div>
 
           <UButton type="submit" class="mt-5" block>Login</UButton>
-          <UButton to= "/" variant="outline"block>Cancel</UButton>
+          <UButton to="/" variant="outline" block>Cancel</UButton>
         </UForm>
 
         <div class="flex justify-center py-5">

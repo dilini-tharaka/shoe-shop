@@ -1,6 +1,9 @@
 <script setup>
 import { computed } from "vue";
 
+useHead({
+  title: "Dashboard | Shoe Shop",
+});
 const color = useColorMode();
 
 const themeIcon = computed(() => {
@@ -129,7 +132,7 @@ function showMenu() {
         </div>
 
         <div class="w-full lg:w-5/6 bg-bkg-primary flex rounded ml-1">
-          <AppAddProduct/>
+          <AppAddProduct />
         </div>
       </div>
     </div>
