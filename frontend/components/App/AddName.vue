@@ -3,7 +3,8 @@ import { addNameSchema } from "~/schema";
 
 const from = ref({
   name: "",
-    brand: "",
+  brand: "",
+  category: [],
 });
 
 //Product list radio button
@@ -47,6 +48,13 @@ function onSubmit() {
         v-model="from.brand"
         v-bind="brand"
       />
+    </UFormGroup>
+
+    <UFormGroup label="category" name="category">
+      <UCheckbox v-model="from.category" value="Men" label="Men" />
+      <UCheckbox v-model="from.category" value="Women" label="Women" />
+      <UCheckbox v-model="from.category" value="Kid" label="Kid" />
+      <UCheckbox v-model="from.category" value="Sports" label="Sports" />
     </UFormGroup>
     <UButton type="submit" color="primary" variant="solid" block
       >Add Name</UButton

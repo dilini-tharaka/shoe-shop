@@ -267,8 +267,18 @@ product.get("/", async (req, res) => {
           },
         },
       },
+      stockdetails:{select:{selling_price:true}}
     },
   });
+
+  const ordererProducts = products.map((product) => ({
+    id: product.id,
+    size: product.sizes.size,
+    length: product.sizes.length,
+    color: product.shoeshascolors.colors.name,
+    brand: product.shoeshascolors.shoes.brand.name,
+  }));
+
   res.json({
     message: "success",
     data: products,

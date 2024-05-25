@@ -21,7 +21,7 @@ async function register() {
     body: JSON.stringify(form.value),
   });
 
-  console.log(register.value.data);
+  console.log(register.value);
   if (register.value.data && register.value.message === "success") {
     alert(`Register success!
     Your email is ${form.value.email}

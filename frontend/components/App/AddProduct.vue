@@ -5,63 +5,61 @@ import { addProductSchema } from "~/schema";
 const filterOption = ["Filter Option", "Brand", "Color", "Size", "ID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
+const shoe = ref([]);
 
+// watch(async () => {
+//   const { data: products } = await useFetch("http://localhost:8000/product");
+//   console.log(products);
+//   console.log(products.value.data);
+//   if (products) {
+//     shoe.value = products.value.data;
+//   } else {
+//     console.log("error");
+//     console.log(products);
+//   }
+// });
+const { data: products } = useFetch("http://localhost:8000/product");
+
+
+watch(products, () => {
+  console.log(products);
+  console.log(products.value.data);
+  if (products) {
+    shoe.value = products.value.data;
+  } else {
+    console.log("error");
+    console.log(products);
+  }
+});
+
+// Table
 const columns = [
   {
     key: "id",
     label: "ID",
   },
   {
-    key: "brand",
+    key: "shoeshascolors.shoes.brand.name",
     label: "Brand",
   },
   {
-    key: "name",
+    key: "shoeshascolors.shoes.name",
     label: "Name",
   },
   {
-    key: "currentPrice",
+    key: "selling_count",
     label: "Current Price",
   },
   {
-    key: "color",
+    key: "shoeshascolors.colors.name",
     label: "Color",
   },
   {
-    key: "size",
+    key: "sizes.size",
     label: "Size",
   },
   {
     key: "actions",
-  },
-];
-
-const shoes = [
-  {
-    id: 1,
-    brand: "Nike",
-    name: "Nike Air Max",
-    currentPrice: 200,
-    color: "black",
-    size: 10,
-  },
-
-  {
-    id: 2,
-    brand: "Adidas",
-    name: "Adidas Superstar",
-    currentPrice: 150,
-    color: "white",
-    size: 10,
-  },
-
-  {
-    id: 3,
-    brand: "Vans",
-    name: "Vans Old Skool",
-    currentPrice: 100,
-    color: "grey",
-    size: 10,
   },
 ];
 
@@ -89,7 +87,7 @@ const page = ref(1);
 const pageCount = 5;
 
 const rows = computed(() => {
-  return shoes.slice((page.value - 1) * pageCount, page.value * pageCount);
+  return shoe.value.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
 // Add Product using radio button
@@ -167,7 +165,7 @@ function clean() {
         <UPagination
           v-model="page"
           :page-count="pageCount"
-          :total="shoes.length"
+          :total="shoe.length"
         />
       </div>
     </div>
