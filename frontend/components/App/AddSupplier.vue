@@ -1,5 +1,6 @@
 <script setup>
 import { addSupplierSchema } from "~/schema";
+
 // Search Filter
 const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
 const selected = ref(filterOption[0]);
@@ -114,16 +115,32 @@ const form = ref({
   checkedBrands: [],
 });
 
+//search function for suppliers || search by id, name, mobile
 function search() {
-  watch((searchedValue) => {
-    console.log(searchedValue.value);
-  });
+  if (selected.value === "ID") {
+    const { data: supplier } = useFetch(
+      `http://localhost:8000/supplier/${searchedValue.value}`
+    );
+    console.log(supplier);
+  } else if (selected.value === "Name") {
+    const { data: supplier } = useFetch(
+      `http://localhost:8000/supplier/name/${searchedValue.value}`
+    );
+    console.log(supplier);
+  } else if (selected.value === "Mobile") {
+    const { data: supplier } = useFetch(
+      `http://localhost:8000/supplier/mobile/${searchedValue.value}`
+    );
+    console.log(supplier);
+  }
 }
 
 function check() {
-  console.log(form.value);
+  console.log(searchedValue.value);
+  console.log(selected.value);
 }
 
+//add supplier
 function addSupplier() {
   const { data: supplier } = useFetch("http://localhost:8000/supplier", {
     method: "POST",
@@ -131,7 +148,7 @@ function addSupplier() {
   });
   console.log(supplier);
 
-  if(supplier && supplier.value.message === "success"){
+  if (supplier && supplier.value.message === "success") {
     form.value = {
       name: "",
       mobile: "",
@@ -145,7 +162,9 @@ function addSupplier() {
       checkedBrands: [],
     };
     return alert("Supplier added successfully");
-}
+  } else {
+    return alert("Error: This Email is already registered");
+  }
 }
 //get next supplir id
 const id = ref(0);
@@ -153,10 +172,9 @@ onMounted(async () => {
   const { data: nextid } = await useFetch(
     "http://localhost:8000/supplier/nextid"
   );
-  console.log(nextid.value.data);
+  //console.log(nextid.value.data);
   id.value = nextid.value.data;
 });
-
 </script>
 
 <template>
@@ -204,7 +222,7 @@ onMounted(async () => {
         <div class="flex gap-5">
           <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
           <h1>ID</h1>
-          <UBadge color="primary" variant="outline" size="xs">{{id}}</UBadge>
+          <UBadge color="primary" variant="outline" size="xs">{{ id }}</UBadge>
         </div>
         <div class="w-full flex flex-row gap-16 items-center">
           <UFormGroup label="Name" name="name">
@@ -237,7 +255,7 @@ onMounted(async () => {
                 v-for="brand in Brands"
                 v-model="form.checkedBrands"
                 :key="brand.id"
-                :value="brand.name"
+                :value="brand.id"
                 :label="brand.name"
               />
             </div>

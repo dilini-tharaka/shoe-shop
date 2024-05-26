@@ -63,6 +63,15 @@ supplier.post("/", async (req, res) => {
             account_owner: req.body.accountHolderName,
           },
         },
+        supplierhasbrands: {
+          create: req.body.checkedBrands.map((brandID: number) => ({
+            brand: {
+              connect: {
+                id: brandID,
+              },
+            },
+          })),
+        },
       },
     });
     console.log(req.body);
@@ -85,6 +94,51 @@ supplier.get("/:id", async (req, res) => {
     const supplier = await prisma.supplier.findUnique({
       where: {
         id: parseInt(id),
+      },
+    });
+    res.json({
+      message: "success",
+      data: supplier,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+//get suppliers using name
+supplier.get("/name/:name", async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    const supppliers = await prisma.supplier.findMany({
+      where: {
+        name: {
+          contains: name,
+        },
+      },
+    });
+
+    res.json({
+      message: "success",
+      data: supppliers,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//get supplier using mobile number
+supplier.get("/mobile/:mobile", async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const supplier = await prisma.supplier.findFirst({
+      where: {
+        mobile: mobile,
       },
     });
     res.json({

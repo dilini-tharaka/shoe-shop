@@ -10,5 +10,5 @@ export const addSupplierSchema = z.object({
     selectedBank: z.string().nonempty(),
     branch: z.string().nonempty('required'),
     accountNumber: z.string().nonempty('valid account number required'),
-    checkedBrands: z.array(z.string()).nonempty('Must select at least one brand'),
+    checkedBrands: z.array(z.number()).nonempty('Must select at least one brand'),
 });
