@@ -7,19 +7,8 @@ const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 const shoe = ref([]);
 
-// watch(async () => {
-//   const { data: products } = await useFetch("http://localhost:8000/product");
-//   console.log(products);
-//   console.log(products.value.data);
-//   if (products) {
-//     shoe.value = products.value.data;
-//   } else {
-//     console.log("error");
-//     console.log(products);
-//   }
-// });
+// Fetching Data
 const { data: products } = useFetch("http://localhost:8000/product");
-
 
 watch(products, () => {
   console.log(products);
@@ -39,23 +28,23 @@ const columns = [
     label: "ID",
   },
   {
-    key: "shoeshascolors.shoes.brand.name",
+    key: "brand",
     label: "Brand",
   },
   {
-    key: "shoeshascolors.shoes.name",
+    key: "name",
     label: "Name",
   },
   {
-    key: "selling_count",
+    key: "selling_price",
     label: "Current Price",
   },
   {
-    key: "shoeshascolors.colors.name",
+    key: "color",
     label: "Color",
   },
   {
-    key: "sizes.size",
+    key: "size",
     label: "Size",
   },
   {

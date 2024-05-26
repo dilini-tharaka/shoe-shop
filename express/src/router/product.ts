@@ -249,6 +249,10 @@ product.post("/shoe", async (req, res) => {
 
 // GET /product
 product.get("/", async (req, res) => {
+
+  try {
+    
+  
   const products = await prisma.product.findMany({
     include: {
       sizes: { select: { size: true, length: true } },
@@ -276,13 +280,26 @@ product.get("/", async (req, res) => {
     size: product.sizes.size,
     length: product.sizes.length,
     color: product.shoeshascolors.colors.name,
+    name: product.shoeshascolors.shoes.name,
     brand: product.shoeshascolors.shoes.brand.name,
+    category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
+    selling_price: product.stockdetails.length > 0 ? product.stockdetails[0].selling_price : 0
+    
+    // category: product.shoeshascolors.shoes.shoeshascategory.map(cat => cat.category.name).join(", ")
   }));
 
   res.json({
     message: "success",
-    data: products,
+    data: ordererProducts,
   });
+
+} catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    
+    });
+}
 });
 
 //Get product by id

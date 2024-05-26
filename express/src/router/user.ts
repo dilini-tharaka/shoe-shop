@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 
 user.get("/", async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        role: true,
+      },
+    });
     res.json({
       message: "success",
       data: users,

@@ -8,21 +8,31 @@ const searchedValue = ref("");
 //Role Filter
 const roleFilter = ["Role", "Admin", "Cashier", "User", "Stock Manager"];
 
+// Fetching Data
+const { data: users } = useFetch("http://localhost:8000/user");
+
+watch(users, () => {
+  console.log(users);
+  console.log(users.value.data);
+  if (users) {
+    Users.value = users.value.data;
+  } else {
+    console.log("error");
+    console.log(users);
+  }
+});
 const columns = [
   {
     key: "id",
     label: "ID",
   },
+ 
   {
-    key: "firstName",
-    label: "First Name",
+    key: "name",
+    label: "Name",
   },
   {
-    key: "lastName",
-    label: "Last Name",
-  },
-  {
-    key: "role",
+    key: "role.name",
     label: "Role",
   },
 
@@ -39,34 +49,7 @@ const columns = [
   },
 ];
 
-const Users = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    role: "Admin",
-    mobile: "+94 78 903 2143",
-    email: "john@gmail.com",
-  },
-
-  {
-    id: 2,
-    firstName: "Jane",
-    lastName: "Doe",
-    role: "User",
-    mobile: "+94 78 903 2143",
-    email: "aggdsg@gmail.com",
-  },
-
-  {
-    id: 3,
-    firstName: "Dilini",
-    lastName: "Perera",
-    role: "User",
-    mobile: "+94 78 903 2143",
-    email: "twytfytafsya@yahoo.com",
-  },
-];
+const Users = ref([]);
 
 const items = (row) => [
   [
@@ -92,7 +75,7 @@ const page = ref(1);
 const pageCount = 5;
 
 const rows = computed(() => {
-  return Users.slice((page.value - 1) * pageCount, page.value * pageCount);
+  return Users.value.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
 const form = ref({

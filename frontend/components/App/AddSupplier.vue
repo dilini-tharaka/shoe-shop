@@ -5,6 +5,31 @@ const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
+// Fetching suppliers from the backend
+const { data: suppliers } = useFetch("http://localhost:8000/supplier");
+
+watch(suppliers, () => {
+  if (suppliers) {
+    Suppliers.value = suppliers.value.data;
+  } else {
+    console.log("error");
+    console.log(suppliers);
+  }
+});
+
+//Fetch brands from the backend
+const Brands = ref([]);
+const { data: brands } = useFetch("http://localhost:8000/product/brand");
+
+watch(brands, () => {
+  if (brands) {
+    Brands.value = brands.value.data;
+  } else {
+    console.log("error");
+    console.log(brands);
+  }
+});
+// Table
 const columns = [
   {
     key: "id",
@@ -33,31 +58,7 @@ const columns = [
   },
 ];
 
-const Suppliers = [
-  {
-    id: 1,
-    name: "John",
-    mobile: "+94 78 903 2143",
-    address: "No.43/2,sggdgs,Kelaniya",
-    email: "john@gmail.com",
-  },
-
-  {
-    id: 2,
-    name: "Perera",
-    mobile: "+94 78 903 2143",
-    address: "No.43/2,sggdgs,Kelaniya",
-    email: "aggdsg@gmail.com",
-  },
-
-  {
-    id: 3,
-    name: "John",
-    mobile: "+94 78 903 2143",
-    address: "No.43/2,sggdgs,Kelaniya",
-    email: "twytfytafsya@yahoo.com",
-  },
-];
+const Suppliers = ref([]);
 
 const items = (row) => [
   [
@@ -83,44 +84,79 @@ const page = ref(1);
 const pageCount = 5;
 
 const rows = computed(() => {
-  return Suppliers.slice((page.value - 1) * pageCount, page.value * pageCount);
+  return Suppliers.value.slice(
+    (page.value - 1) * pageCount,
+    page.value * pageCount
+  );
 });
 
 //select menu for district
 const district = ["Colombo", "Gampaha", "Kalutara", "Kandy", "Galle"];
 
 //checkbox for available brands
-const checkedBrands = ref([]);
 
 //slideover for add brand
 const isBrand = ref(false);
 
 //select menu for bank name
-const bankName = ["BOC", "Sampath","Peoples"];
+const bankName = ["BOC", "Sampath", "Peoples"];
 
 const form = ref({
   name: "",
   mobile: "",
   email: "",
   address: "",
-  selectedDistrict: district[0],
+  nic: "",
   selectedBank: bankName[0],
   accountHolderName: "",
   accountNumber: "",
   branch: "",
+  checkedBrands: [],
 });
 
 function search() {
-  console.log("Search");
+  watch((searchedValue) => {
+    console.log(searchedValue.value);
+  });
 }
 
 function check() {
-  console.log(checkedBrands.value);
+  console.log(form.value);
 }
 
 function addSupplier() {
-  console.log(form.value);
+  const { data: supplier } = useFetch("http://localhost:8000/supplier", {
+    method: "POST",
+    body: JSON.stringify(form.value),
+  });
+  console.log(supplier);
+
+  if(supplier && supplier.value.message === "success"){
+    form.value = {
+      name: "",
+      mobile: "",
+      email: "",
+      address: "",
+      nic: "",
+      selectedBank: bankName[0],
+      accountHolderName: "",
+      accountNumber: "",
+      branch: "",
+      checkedBrands: [],
+    };
+    return alert("Supplier added successfully");
 }
+}
+//get next supplir id
+const id = ref(0);
+onMounted(async () => {
+  const { data: nextid } = await useFetch(
+    "http://localhost:8000/supplier/nextid"
+  );
+  console.log(nextid.value.data);
+  id.value = nextid.value.data;
+});
+
 </script>
 
 <template>
@@ -164,12 +200,12 @@ function addSupplier() {
       </div>
     </div>
     <div class="w-full flex flex-col gap-2">
-      <div class="flex gap-5">
-        <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
-        <h1>ID</h1>
-        <UBadge color="primary" variant="outline" size="xs">458</UBadge>
-      </div>
       <UForm :schema="addSupplierSchema" :state="form" @submit="addSupplier">
+        <div class="flex gap-5">
+          <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
+          <h1>ID</h1>
+          <UBadge color="primary" variant="outline" size="xs">{{id}}</UBadge>
+        </div>
         <div class="w-full flex flex-row gap-16 items-center">
           <UFormGroup label="Name" name="name">
             <UInput v-model="form.name" />
@@ -180,7 +216,7 @@ function addSupplier() {
           </UFormGroup>
 
           <UFormGroup label="Email" name="email" class="w-1/2">
-            <UInput v-model="form.email" />
+            <UInput placeholder="sample@gmail.com" v-model="form.email" />
           </UFormGroup>
         </div>
 
@@ -189,25 +225,23 @@ function addSupplier() {
             <UInput v-model="form.address" />
           </UFormGroup>
 
-          <UFormGroup label="District" class="w-1/4" name="selectedDistrict">
-            <USelectMenu
-              color="primary"
-              :options="district"
-              v-model="form.selectedDistrict"
-            />
+          <UFormGroup label="NIC" class="w-1/4" name="nic">
+            <UInput v-model="form.nic" />
           </UFormGroup>
         </div>
 
-        <div class="flex flex-row flex-wrap gap-10 items-center">
-          <h1>Available Brands</h1>
-
-          <UCheckbox v-model="checkedBrands" value="addidas" label="Addidas" />
-
-          <UCheckbox v-model="checkedBrands" value="nike" label="Nike" />
-
-          <UCheckbox v-model="checkedBrands" value="puma" label="Puma" />
-
-          <UCheckbox v-model="checkedBrands" value="reebok" label="Reebok" />
+        <div class="flex flex-row flex-wrap gap-6 items-center">
+          <UFormGroup label="Available Brands" name="checkedBrands">
+            <div class="flex gap-5">
+              <UCheckbox
+                v-for="brand in Brands"
+                v-model="form.checkedBrands"
+                :key="brand.id"
+                :value="brand.name"
+                :label="brand.name"
+              />
+            </div>
+          </UFormGroup>
           <UButton
             icon="solar:add-circle-broken"
             size="sm"
@@ -222,7 +256,11 @@ function addSupplier() {
         <div class="flex flex-col">
           <h1 class="font-bold">Bank Details</h1>
           <div class="w-full flex flex-row gap-5 items-center">
-            <UFormGroup label="Account Owner's Name" class="w-1/5" name="accountHolderName">
+            <UFormGroup
+              label="Account Owner's Name"
+              class="w-1/5"
+              name="accountHolderName"
+            >
               <UInput v-model="form.accountHolderName" />
             </UFormGroup>
 
@@ -234,20 +272,24 @@ function addSupplier() {
               />
             </UFormGroup>
 
-            <UFormGroup label="Account Number" class="w-1/4" name="accountNumber">
-              <UInput v-model="form.accountNumber"/>
+            <UFormGroup
+              label="Account Number"
+              class="w-1/4"
+              name="accountNumber"
+            >
+              <UInput v-model="form.accountNumber" />
             </UFormGroup>
 
             <UFormGroup label="Branch" class="w-1/5" name="branch">
-              <UInput v-model="form.branch"/>
+              <UInput v-model="form.branch" />
             </UFormGroup>
           </div>
         </div>
-        <div class="w-1/2 flex items-center gap-2  pt-4">
+        <div class="w-1/2 flex items-center gap-2 pt-4">
           <UButton type="submit" color="primary" variant="solid" block
             >Add Supplier</UButton
           >
-          <UButton color="gray" variant="solid"  @click="check" block
+          <UButton color="gray" variant="solid" @click="check" block
             >Cancel</UButton
           >
         </div>
