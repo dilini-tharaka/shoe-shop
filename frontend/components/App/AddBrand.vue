@@ -1,5 +1,5 @@
 <script setup>
-import { addBrandSchema } from "~/schema/addBrand.schema";
+//import { addBrandSchema } from "~/schema/addBrand.schema";
 
 
 const form = ref({
@@ -16,6 +16,9 @@ watch(nextId, () => {
 
 // Fetching brands from the backend
 async function onSubmit() {
+  if (!form.value.name) {
+    return alert("Please enter brand name");
+  }
   const { data } = await useFetch("http://localhost:8000/product/brand", {
     method: "POST",
     body: JSON.stringify(form.value),
@@ -36,7 +39,7 @@ console.log(form.value);
 
 <template>
   <UForm
-    :schema="addBrandSchema"
+    
     :state="form"
     @submit="onSubmit"
     class="p-4 flex-1 flex flex-col gap-5"

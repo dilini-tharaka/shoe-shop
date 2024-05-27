@@ -40,7 +40,73 @@ user.get("/role", async (req, res) => {
   }
 });
 
+//get next user id
+user.get("/nextid", async (req, res) => {
+  try {
+    const userID = await prisma.user.aggregate({
+      _max: {
+        id: true,
+      },
+    });
 
+    // Calculate the next id by adding 1
+    const nextId = (userID._max.id || 0) + 1;
+
+    res.json({
+      message: "success",
+      data: nextId,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//get user by mobile
+user.get("/mobile/:mobile", async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const employee = await prisma.user.findMany({
+      where: {
+        mobile: mobile,
+      },
+    });
+    res.json({
+      message: "success",
+      data: employee,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//get user by role
+user.get("/role/:role", async (req, res) => {
+  try {
+    const { role } = req.params;
+    const employee = await prisma.user.findMany({
+      where: {
+        role: {
+          name: role,
+        },
+      },
+    });
+    res.json({
+      message: "success",
+      data: employee,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
 // create user
 user.post("/", async (req, res) => {
   try {

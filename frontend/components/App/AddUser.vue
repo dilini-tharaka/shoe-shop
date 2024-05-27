@@ -5,6 +5,26 @@ const filterOption = ["Filter Option", "ID", "Mobile", "Role"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
+//Search user by id, mobile, role
+async function search() {
+  if (selected.value === "ID") {
+    const { data: user } = await useFetch(
+      `http://localhost:8000/user/${searchedValue.value}`
+    );
+    console.log(user);
+  } else if (selected.value === "Mobile") {
+    const { data: user } = await useFetch(
+      `http://localhost:8000/user/mobile/${searchedValue.value}`
+    );
+    console.log(user);
+  } else if (selected.value === "Role") {
+    const { data: user } = await useFetch(
+      `http://localhost:8000/user/role/${searchedValue.value}`
+    );
+    console.log(user);
+  }
+}
+
 const form = ref({
   firstName: "",
   lastName: "",
@@ -12,10 +32,9 @@ const form = ref({
   mobile: "",
   email: "",
   role_id: "",
-  selectedRole:"",
+  selectedRole: "",
   userName: "",
   password: "",
-  
 });
 //Role Filter
 const Roles = ref([]);
@@ -24,15 +43,13 @@ const RoleLookup = ref({});
 
 watch(roles, () => {
   if (roles.value && roles.value.data) {
-
     RoleLookup.value = roles.value.data.reduce((acc, role) => {
       acc[role.name] = role.id;
       return acc;
     }, {});
 
     // Create an array of role names
-    Roles.value = roles.value.data.map(role => role.name);
-    
+    Roles.value = roles.value.data.map((role) => role.name);
   } else {
     console.log("error");
     console.log(roles);
@@ -47,16 +64,12 @@ watch(roleId, (newRoleId) => {
   form.value.role_id = newRoleId;
 });
 
-
-
-
 ///// ********************************************** /////////
 // Fetching Data
 const Users = ref([]);
 const { data: users } = useFetch("http://localhost:8000/user");
 
 watch(users, () => {
-  
   if (users) {
     Users.value = users.value.data;
   } else {
@@ -69,7 +82,7 @@ const columns = [
     key: "id",
     label: "ID",
   },
- 
+
   {
     key: "name",
     label: "Name",
@@ -116,26 +129,56 @@ const page = ref(1);
 const pageCount = 5;
 
 const rows = computed(() => {
-  return Users.value.slice((page.value - 1) * pageCount, page.value * pageCount);
+  return Users.value.slice(
+    (page.value - 1) * pageCount,
+    page.value * pageCount
+  );
 });
 
-
-
-function search() {
-  console.log("Search");
-}
+//get next user id
+const id = ref(0);
+onMounted(async()=>{
+  const {data} = await useFetch("http://localhost:8000/user/nextid");
+  id.value = data.value.data;
+})
 
 async function addUser() {
-  console.log(form.value);
-
-  const {data:user} = await useFetch("http://localhost:8000/user",{
+  const { data: user } = await useFetch("http://localhost:8000/user", {
     method: "POST",
     body: JSON.stringify(form.value),
   });
+  //console.log(user);
+
+  if (user.value.data && user.value.message === "success") {
+    form.value = {
+      firstName: "",
+      lastName: "",
+      nic: "",
+      mobile: "",
+      email: "",
+      role_id: "",
+      selectedRole: "",
+      userName: "",
+      password: "",
+    };
+    return alert("User Added Successfully");
+  } else {
+    return alert("User Adding Failed");
+  }
 }
 
-function check() {
-  console.log(form.value);
+function cancel() {
+  form.value = {
+    firstName: "",
+    lastName: "",
+    nic: "",
+    mobile: "",
+    email: "",
+    role_id: "",
+    selectedRole: "",
+    userName: "",
+    password: "",
+  };
 }
 </script>
 
@@ -180,29 +223,32 @@ function check() {
       </div>
     </div>
     <div class="w-full flex flex-col px-3 pb-3">
-      <h1 class="text-lg font-mono font-bold">Add New User</h1>
       <UForm :schema="addUserSchema" :state="form" @submit="addUser">
+        <div class="flex gap-4">
+          <h1 class="text-lg font-mono font-bold">Add New User</h1>
+          <UBadge color="primary" variant="outline" size="xs">{{id}}</UBadge>
+        </div>
         <div class="flex flex-row gap-16 items-center px-2">
           <UFormGroup label="First Name" name="firstName">
-            <UInput v-model="form.firstName"/>
+            <UInput v-model="form.firstName" />
           </UFormGroup>
 
           <UFormGroup label="Last Name" name="lastName">
-            <UInput v-model="form.lastName"/>
+            <UInput v-model="form.lastName" />
           </UFormGroup>
 
           <UFormGroup label="NIC" name="nic">
-            <UInput v-model="form.nic"/>
+            <UInput v-model="form.nic" />
           </UFormGroup>
         </div>
 
         <div class="flex flex-row gap-16 items-center p-2">
           <UFormGroup label="Mobile" name="mobile">
-            <UInput v-model="form.mobile"/>
+            <UInput v-model="form.mobile" />
           </UFormGroup>
 
           <UFormGroup label="Email" class="w-2/5" name="email">
-            <UInput v-model="form.email"/>
+            <UInput v-model="form.email" />
           </UFormGroup>
         </div>
 
@@ -216,15 +262,19 @@ function check() {
           </UFormGroup>
 
           <UFormGroup label="User Name" name="userName">
-            <UInput v-model="form.userName"/>
+            <UInput v-model="form.userName" />
           </UFormGroup>
 
           <UFormGroup label="Password" name="password">
-            <UInput v-model="form.password"/>
+            <UInput v-model="form.password" />
           </UFormGroup>
           <div class="flex flex-wrap items-center gap-2 w-2/5">
-            <UButton type="submit" color="primary" variant="solid" block>Add User</UButton>
-            <UButton color="gray" variant="solid" block @click = "check">Cancel</UButton>
+            <UButton type="submit" color="primary" variant="solid" block
+              >Add User</UButton
+            >
+            <UButton color="gray" variant="solid" block @click="cancel"
+              >Cancel</UButton
+            >
           </div>
         </div>
       </UForm>
