@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const user = express.Router();
 const prisma = new PrismaClient();
 
+//Get all users
 user.get("/", async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -23,13 +24,44 @@ user.get("/", async (req, res) => {
   }
 });
 
-// get user by id
-user.get("/:id", async (req, res) => {
+// Get all roles
+user.get("/role", async (req, res) => {
   try {
-    const { id } = req.params;
-    const employee = await prisma.user.findUnique({
-      where: {
-        id: parseInt(id),
+    const roles = await prisma.role.findMany();
+    res.json({
+      message: "success",
+      data: roles,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+
+// create user
+user.post("/", async (req, res) => {
+  try {
+    const { firstName, lastName} = req.body;
+
+    // Get name by concatenating firstname and lastname
+    const name = `${firstName} ${lastName}`;
+    const employee = await prisma.user.create({
+      data: {
+        name: name,
+        mobile: req.body.mobile,
+        nic: req.body.nic,
+        email: req.body.email,
+        userName: req.body.userName,
+        password: req.body.password,
+        created_at: new Date(),
+        role: {
+          connect: {
+            id: req.body.role_id,
+          },
+        },
       },
     });
     res.json({
@@ -44,23 +76,13 @@ user.get("/:id", async (req, res) => {
   }
 });
 
-// create user
-user.post("/", async (req, res) => {
+// get user by id
+user.get("/:id", async (req, res) => {
   try {
-    const employee = await prisma.user.create({
-      data: {
-        name: req.body.name,
-        mobile: req.body.mobile,
-        nic: req.body.nic,
-        email: req.body.email,
-        userName: req.body.userName,
-        password: req.body.password,
-        created_at: new Date(),
-        role: {
-          connect: {
-            id: req.body.role_id,
-          },
-        },
+    const { id } = req.params;
+    const employee = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id),
       },
     });
     res.json({

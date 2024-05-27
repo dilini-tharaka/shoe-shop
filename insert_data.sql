@@ -7,8 +7,7 @@ INSERT INTO Role (name) VALUES
 ('Admin'),
 ('Stock Manager'), 
 ('Assistant'), 
-('Cashier'), 
-('Customer');
+('Cashier');
 
 -- -----------------------------------------------------
 -- Tauserble `User`

@@ -13,6 +13,29 @@ product.get("/brand", async (req, res) => {
   });
 });
 
+//get next brand id
+product.get("/brand/nextid", async (req, res) => {
+  try {
+    const brandID = await prisma.brand.aggregate({
+      _max: {
+        id: true,
+      },
+    });
+
+    const nextId = (brandID._max.id || 0) + 1;
+
+    res.json({
+      message: "success",
+      data: nextId,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
 //Create a new brand
 product.post("/brand", async (req, res) => {
   try {

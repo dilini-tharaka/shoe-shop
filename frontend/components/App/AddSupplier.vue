@@ -1,12 +1,8 @@
 <script setup>
 import { addSupplierSchema } from "~/schema";
 
-// Search Filter
-const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
-const selected = ref(filterOption[0]);
-const searchedValue = ref("");
-
 // Fetching suppliers from the backend
+const Suppliers = ref([]);
 const { data: suppliers } = useFetch("http://localhost:8000/supplier");
 
 watch(suppliers, () => {
@@ -58,8 +54,6 @@ const columns = [
     key: "actions",
   },
 ];
-
-const Suppliers = ref([]);
 
 const items = (row) => [
   [
@@ -115,29 +109,56 @@ const form = ref({
   checkedBrands: [],
 });
 
+//get next supplir id
+const id = ref(0);
+onMounted(async () => {
+  const { data: nextid } = await useFetch(
+    "http://localhost:8000/supplier/nextid"
+  );
+  //console.log(nextid.value.data);
+  id.value = nextid.value.data;
+});
+
+// Search Filter
+const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
+const selected = ref(filterOption[0]);
+const searchedValue = ref("");
 //search function for suppliers || search by id, name, mobile
-function search() {
+async function search() {
   if (selected.value === "ID") {
-    const { data: supplier } = useFetch(
+    const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/${searchedValue.value}`
     );
     console.log(supplier);
   } else if (selected.value === "Name") {
-    const { data: supplier } = useFetch(
+    const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/name/${searchedValue.value}`
     );
     console.log(supplier);
   } else if (selected.value === "Mobile") {
-    const { data: supplier } = useFetch(
+    const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/mobile/${searchedValue.value}`
     );
     console.log(supplier);
   }
 }
 
-function check() {
-  console.log(searchedValue.value);
-  console.log(selected.value);
+function addBrand() {
+  isBrand.value = true
+}
+function cancel() {
+  form.value = {
+    name: "",
+    mobile: "",
+    email: "",
+    address: "",
+    nic: "",
+    selectedBank: bankName[0],
+    accountHolderName: "",
+    accountNumber: "",
+    branch: "",
+    checkedBrands: [],
+  };
 }
 
 //add supplier
@@ -166,15 +187,6 @@ function addSupplier() {
     return alert("Error: This Email is already registered");
   }
 }
-//get next supplir id
-const id = ref(0);
-onMounted(async () => {
-  const { data: nextid } = await useFetch(
-    "http://localhost:8000/supplier/nextid"
-  );
-  //console.log(nextid.value.data);
-  id.value = nextid.value.data;
-});
 </script>
 
 <template>
@@ -265,7 +277,7 @@ onMounted(async () => {
             size="sm"
             color="primary"
             variant="ghost"
-            @click="isBrand = true"
+            @click="addBrand"
           />
           <USlideover v-model="isBrand">
             <AppAddBrand />
@@ -307,7 +319,7 @@ onMounted(async () => {
           <UButton type="submit" color="primary" variant="solid" block
             >Add Supplier</UButton
           >
-          <UButton color="gray" variant="solid" @click="check" block
+          <UButton color="gray" variant="solid" @click="cancel" block
             >Cancel</UButton
           >
         </div>

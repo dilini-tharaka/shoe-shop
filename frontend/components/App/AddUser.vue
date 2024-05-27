@@ -5,15 +5,58 @@ const filterOption = ["Filter Option", "ID", "Mobile", "Role"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
+const form = ref({
+  firstName: "",
+  lastName: "",
+  nic: "",
+  mobile: "",
+  email: "",
+  role_id: "",
+  selectedRole:"",
+  userName: "",
+  password: "",
+  
+});
 //Role Filter
-const roleFilter = ["Role", "Admin", "Cashier", "User", "Stock Manager"];
+const Roles = ref([]);
+const { data: roles } = useFetch("http://localhost:8000/user/role");
+const RoleLookup = ref({});
 
+watch(roles, () => {
+  if (roles.value && roles.value.data) {
+
+    RoleLookup.value = roles.value.data.reduce((acc, role) => {
+      acc[role.name] = role.id;
+      return acc;
+    }, {});
+
+    // Create an array of role names
+    Roles.value = roles.value.data.map(role => role.name);
+    
+  } else {
+    console.log("error");
+    console.log(roles);
+  }
+});
+
+const roleId = computed(() => {
+  return RoleLookup.value[form.value.selectedRole] || null;
+});
+
+watch(roleId, (newRoleId) => {
+  form.value.role_id = newRoleId;
+});
+
+
+
+
+///// ********************************************** /////////
 // Fetching Data
+const Users = ref([]);
 const { data: users } = useFetch("http://localhost:8000/user");
 
 watch(users, () => {
-  console.log(users);
-  console.log(users.value.data);
+  
   if (users) {
     Users.value = users.value.data;
   } else {
@@ -49,8 +92,6 @@ const columns = [
   },
 ];
 
-const Users = ref([]);
-
 const items = (row) => [
   [
     {
@@ -78,23 +119,23 @@ const rows = computed(() => {
   return Users.value.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
-const form = ref({
-  firstName: "",
-  lastName: "",
-  nic: "",
-  mobile: 0,
-  email: "",
-  selectedRole: "",
-  userName: "",
-  password: "",
-});
+
 
 function search() {
   console.log("Search");
 }
 
-function addUser() {
-  console.log("Add User");
+async function addUser() {
+  console.log(form.value);
+
+  const {data:user} = await useFetch("http://localhost:8000/user",{
+    method: "POST",
+    body: JSON.stringify(form.value),
+  });
+}
+
+function check() {
+  console.log(form.value);
 }
 </script>
 
@@ -166,10 +207,10 @@ function addUser() {
         </div>
 
         <div class="flex flex-row gap-16 items-center p-2">
-          <UFormGroup label="Role" class="w-2/12" name="role">
+          <UFormGroup label="Role" class="w-2/12" name="selectedRole">
             <USelectMenu
               color="primary"
-              :options="roleFilter"
+              :options="Roles"
               v-model="form.selectedRole"
             />
           </UFormGroup>
@@ -183,7 +224,7 @@ function addUser() {
           </UFormGroup>
           <div class="flex flex-wrap items-center gap-2 w-2/5">
             <UButton type="submit" color="primary" variant="solid" block>Add User</UButton>
-            <UButton color="gray" variant="solid" block>Cancel</UButton>
+            <UButton color="gray" variant="solid" block @click = "check">Cancel</UButton>
           </div>
         </div>
       </UForm>
