@@ -92,7 +92,9 @@ user.get("/role/:role", async (req, res) => {
     const employee = await prisma.user.findMany({
       where: {
         role: {
-          name: role,
+          name: {
+            contains: role,
+          },
         },
       },
     });

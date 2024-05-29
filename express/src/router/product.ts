@@ -89,15 +89,27 @@ product.get("/color/:id", async (req, res) => {
 //Create a new color
 product.post("/color", async (req, res) => {
   try {
-    const color = await prisma.colors.create({
-      data: {
-        name: req.body.name,
+    const existingColor = await prisma.colors.findFirst({
+      where: {
+        name: req.body.color,
       },
     });
-    res.json({
-      message: "success",
-      data: color,
-    });
+    if (existingColor) {
+      res.json({
+        message: "Already exists",
+        data: existingColor,
+      });
+    } else {
+      const color = await prisma.colors.create({
+        data: {
+          name: req.body.color,
+        },
+      });
+      res.json({
+        message: "success",
+        data: color,
+      });
+    }
   } catch (error: any) {
     res.json({
       message: "error",
@@ -141,7 +153,7 @@ product.post("/size", async (req, res) => {
   try {
     const size = await prisma.sizes.create({
       data: {
-        size: req.body.size,
+        size: String(req.body.size),
         length: req.body.length,
       },
     });
@@ -195,9 +207,17 @@ product.get("/shoe", async (req, res) => {
         },
       },
     });
+
+    const ordererShoes = shoes.map((shoe) => ({
+      id: shoe.id,
+      name: shoe.name,
+      brand: shoe.brand.name,
+      category: shoe.shoeshascategory.map((cat) => cat.category.name).join(", "),
+    }));
+
     res.json({
       message: "success",
-      data: shoes,
+      data: ordererShoes,
     });
   } catch (error: any) {
     res.json({
@@ -224,6 +244,8 @@ product.get("/shoe/:id", async (req, res) => {
         },
       },
     });
+
+
     res.json({
       message: "success",
       data: shoe,
@@ -247,15 +269,15 @@ product.post("/shoe", async (req, res) => {
           },
         },
         name: req.body.name,
-        shoeshascategory:{
-          create:{
-            category:{
-              connect:{
-                id:req.body.category_id
-              }
-            }
-          }
-        }
+        shoeshascategory: {
+          create: {
+            category: {
+              connect: {
+                id: req.body.category_id,
+              },
+            },
+          },
+        },
       },
     });
     res.json({
@@ -272,57 +294,55 @@ product.post("/shoe", async (req, res) => {
 
 // GET /product
 product.get("/", async (req, res) => {
-
   try {
-    
-  
-  const products = await prisma.product.findMany({
-    include: {
-      sizes: { select: { size: true, length: true } },
-      shoeshascolors: {
-        include: {
-          colors: { select: { name: true } },
-          shoes: {
-            include: {
-              brand: { select: { name: true } },
-              shoeshascategory: {
-                include: {
-                  category: { select: { name: true } },
+    const products = await prisma.product.findMany({
+      include: {
+        sizes: { select: { size: true, length: true } },
+        shoeshascolors: {
+          include: {
+            colors: { select: { name: true } },
+            shoes: {
+              include: {
+                brand: { select: { name: true } },
+                shoeshascategory: {
+                  include: {
+                    category: { select: { name: true } },
+                  },
                 },
               },
             },
           },
         },
+        stockdetails: { select: { selling_price: true } },
       },
-      stockdetails:{select:{selling_price:true}}
-    },
-  });
+    });
 
-  const ordererProducts = products.map((product) => ({
-    id: product.id,
-    size: product.sizes.size,
-    length: product.sizes.length,
-    color: product.shoeshascolors.colors.name,
-    name: product.shoeshascolors.shoes.name,
-    brand: product.shoeshascolors.shoes.brand.name,
-    category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
-    selling_price: product.stockdetails.length > 0 ? product.stockdetails[0].selling_price : 0
-    
-    // category: product.shoeshascolors.shoes.shoeshascategory.map(cat => cat.category.name).join(", ")
-  }));
+    const ordererProducts = products.map((product) => ({
+      id: product.id,
+      size: product.sizes.size,
+      length: product.sizes.length,
+      color: product.shoeshascolors.colors.name,
+      name: product.shoeshascolors.shoes.name,
+      brand: product.shoeshascolors.shoes.brand.name,
+      category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
+      selling_price:
+        product.stockdetails.length > 0
+          ? product.stockdetails[0].selling_price
+          : 0,
 
-  res.json({
-    message: "success",
-    data: ordererProducts,
-  });
+      // category: product.shoeshascolors.shoes.shoeshascategory.map(cat => cat.category.name).join(", ")
+    }));
 
-} catch (error: any) {
+    res.json({
+      message: "success",
+      data: ordererProducts,
+    });
+  } catch (error: any) {
     res.json({
       message: "error",
       data: error.message,
-    
     });
-}
+  }
 });
 
 //Get product by id

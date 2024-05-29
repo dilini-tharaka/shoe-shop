@@ -3,19 +3,28 @@ import { addNameSchema } from "~/schema";
 
 const from = ref({
   name: "",
-  brand: "",
+  brand: 0,
   category: [],
 });
 
-//Product list radio button
-const brands = [
-  { value: "Nike", label: "Nike" },
-  { value: "Adidas", label: "Adidas" },
-  { value: "Vans", label: "Vans" },
-  { value: "Converse", label: "Converse" },
-  { value: "Puma", label: "Puma" },
-  { value: "Reebok", label: "Reebok" },
-];
+// Add Product using radio button
+const Brands = ref([]);
+
+//Fetch brand using radio button
+const { data: brand } = useFetch("http://localhost:8000/product/brand");
+watch(brand, () => {
+  if (brand.value && brand.value.message === "success") {
+    const newBrands = brand.value.data.map((item) => ({
+      value: item.id,
+      label: item.name,
+    }));
+
+    Brands.value = newBrands;
+  } else {
+    console.log("error");
+    console.log(brand);
+  }
+});
 
 function onSubmit() {
   console.log(from);
@@ -43,8 +52,8 @@ function onSubmit() {
 
     <UFormGroup label="Brand" name="brand">
       <URadio
-        v-for="brand of brands"
-        :key="brand.value"
+        v-for="brand of Brands"
+        :key="Brands.value"
         v-model="from.brand"
         v-bind="brand"
       />

@@ -1,5 +1,5 @@
 import {z} from 'zod';
 
 export const addColorSchema = z.object({
-    color: z.string().nonempty().min(2,"Must be at least 2 characters"),
+    color: z.string().min(2,"Must be a valid color name").max(10,"Must be a less than 10 characters"),
     });

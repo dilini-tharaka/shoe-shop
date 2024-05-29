@@ -17,7 +17,7 @@ function toggleMenu() {
       <div
         class="w-full min-h-screen p-8 bg-bkg-primary rounded-lg shadow dark:shadow-black"
       >
-        <AppAddUser/>
+        <AppAddProduct/>
       </div>
     </NuxtLayout>
   </div>

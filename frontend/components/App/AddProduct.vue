@@ -7,12 +7,10 @@ const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 const shoe = ref([]);
 
-// Fetching Data
+// Fetching Data to display in table
 const { data: products } = useFetch("http://localhost:8000/product");
 
 watch(products, () => {
-  console.log(products);
-  console.log(products.value.data);
   if (products) {
     shoe.value = products.value.data;
   } else {
@@ -21,7 +19,7 @@ watch(products, () => {
   }
 });
 
-// Table
+// Table columns
 const columns = [
   {
     key: "id",
@@ -80,19 +78,28 @@ const rows = computed(() => {
 });
 
 // Add Product using radio button
-const brands = [
-  { value: "Nike", label: "Nike" },
-  { value: "Adidas", label: "Adidas" },
-  { value: "Vans", label: "Vans" },
-  { value: "Converse", label: "Converse" },
-  { value: "Puma", label: "Puma" },
-  { value: "Reebok", label: "Reebok" },
-];
+const Brands = ref( []);
+
+//Fetch brand using radio button
+const { data: brand } = useFetch("http://localhost:8000/product/brand");
+watch(brand, () => {
+  if (brand.value && brand.value.message === "success") {
+    const newBrands = brand.value.data.map((item) => ({
+      value: item.id,
+      label: item.name,
+    }));
+
+    Brands.value = newBrands;
+  } else {
+    console.log("error");
+    console.log(brand);
+  }
+});
 
 const state = ref({
   size: "",
   color: "",
-  brand: "",
+  brand: 0,
   name: "",
 });
 
@@ -106,16 +113,33 @@ function search() {
   console.log("Search");
 }
 
-function addName() {
-  console.log("Add Name");
-}
-
 function addProduct() {
   console.log("Submit");
 }
 
 function clean() {
   console.log("cancel clicking");
+  console.log(state.value)
+}
+
+function addSize() {
+  isSize.value = true;
+  console.log("Add Size");
+}
+
+function addColor() {
+  isColor.value = true;
+  console.log("Add Color");
+}
+
+function addBrand() {
+  isBrand.value = true;
+  console.log("Add Brand");
+}
+
+function addName() {
+  isName.value = true;
+  console.log("Add Name");
 }
 </script>
 
@@ -161,7 +185,7 @@ function clean() {
 
     <div class="w-full flex flex-col px-3 pb-3">
       <UForm :schema="addProductSchema" :state="state" @submit="addProduct">
-        <div class="">
+        <div>
           <h1 class="text-lg font-mono font-bold">Add Product</h1>
         </div>
 
@@ -180,7 +204,7 @@ function clean() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="isSize = true"
+              @click="addSize"
             />
             <USlideover v-model="isSize">
               <AppAddSize />
@@ -195,7 +219,7 @@ function clean() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="isColor = true"
+              @click="addColor"
             />
 
             <USlideover v-model="isColor">
@@ -204,19 +228,22 @@ function clean() {
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-4 py-3">
-          <label for="brand">Brands:</label>
-          <URadio
-            v-for="brand of brands"
-            :key="brand.value"
-            v-model="state.brand"
-            v-bind="brand"
-          />
+          <UFormGroup label="Brands:" name="brand">
+            <div class="flex gap-4 items-center">
+              <URadio
+                v-for="brand of Brands"
+                :key="Brands.value"
+                v-model="state.brand"
+                v-bind="brand"
+              />
+            </div>
+          </UFormGroup>
           <UButton
             icon="solar:add-circle-broken"
             size="sm"
             color="primary"
             variant="ghost"
-            @click="isBrand = true"
+            @click="addBrand"
           />
           <USlideover v-model="isBrand">
             <AppAddBrand />
@@ -232,14 +259,16 @@ function clean() {
             size="sm"
             color="primary"
             variant="ghost"
-            @click="isName = true"
+            @click="addName"
           />
           <USlideover v-model="isName">
             <AppAddName />
           </USlideover>
           <div class="flex justify-center gap-6 px-2">
             <UButton type="submit" class="my-5">Add a Product</UButton>
-            <UButton class="my-5" color="black" @click="clean">Cancel</UButton>
+            <UButton class="my-5" color="gray" variant="solid" @click="clean"
+              >Cancel</UButton
+            >
           </div>
         </div>
       </UForm>
