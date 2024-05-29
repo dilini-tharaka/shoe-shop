@@ -78,7 +78,7 @@ const rows = computed(() => {
 });
 
 // Add Product using radio button
-const Brands = ref( []);
+const Brands = ref([]);
 
 //Fetch brand using radio button
 const { data: brand } = useFetch("http://localhost:8000/product/brand");
@@ -96,8 +96,9 @@ watch(brand, () => {
   }
 });
 
-const state = ref({
+const form = ref({
   size: "",
+  selectedSize: "",
   color: "",
   brand: 0,
   name: "",
@@ -109,6 +110,40 @@ const isColor = ref(false);
 const isBrand = ref(false);
 const isName = ref(false);
 
+//Get size for select option
+const SizeLookup = ref({});
+const Sizes = ref([]);
+const { data: sizeData } = useFetch("http://localhost:8000/product/size");
+watch(sizeData, () => {
+  if (sizeData.value && sizeData.value.message === "success") {
+    SizeLookup.value = sizeData.value.data.reduce((acc, size) => {
+      acc[size.size] = size.id;
+      return acc;
+    }, {});
+
+    // Create an array of size
+    Sizes.value = sizeData.value.data.map((size) => size.size);
+   
+  } else {
+    console.log("error");
+    console.log(sizeData);
+  }
+});
+
+const sizeId = computed(() => {
+  return SizeLookup.value[form.value.selectedSize] || null;
+});
+
+watch(sizeId, (newsizeID) => {
+  form.value.size = newsizeID;
+});
+
+///////////**********************////////////////
+
+//Get color for select option
+
+
+
 function search() {
   console.log("Search");
 }
@@ -119,7 +154,7 @@ function addProduct() {
 
 function clean() {
   console.log("cancel clicking");
-  console.log(state.value)
+  console.log(form.value);
 }
 
 function addSize() {
@@ -139,7 +174,6 @@ function addBrand() {
 
 function addName() {
   isName.value = true;
-  console.log("Add Name");
 }
 </script>
 
@@ -184,7 +218,7 @@ function addName() {
     </div>
 
     <div class="w-full flex flex-col px-3 pb-3">
-      <UForm :schema="addProductSchema" :state="state" @submit="addProduct">
+      <UForm :schema="addProductSchema" :state="form" @submit="addProduct">
         <div>
           <h1 class="text-lg font-mono font-bold">Add Product</h1>
         </div>
@@ -195,8 +229,12 @@ function addName() {
           </UFormGroup>
 
           <div class="flex justify-center items-center">
-            <UFormGroup label="Size:" name="size">
-              <UInput v-model="state.size" />
+            <UFormGroup label="Size:" name="selectedSize">
+              <USelectMenu
+                color="primary"
+                :options="Sizes"
+                v-model="form.selectedSize"
+              />
             </UFormGroup>
 
             <UButton
@@ -212,7 +250,7 @@ function addName() {
           </div>
           <div class="flex justify-center items-center">
             <UFormGroup label="Color:" name="color">
-              <UInput v-model="state.color" />
+              <UInput v-model="form.color" />
             </UFormGroup>
             <UButton
               icon="solar:add-circle-broken"
@@ -233,7 +271,7 @@ function addName() {
               <URadio
                 v-for="brand of Brands"
                 :key="Brands.value"
-                v-model="state.brand"
+                v-model="form.brand"
                 v-bind="brand"
               />
             </div>
@@ -251,7 +289,7 @@ function addName() {
         </div>
         <div class="w-full flex flex-row items-center gap-2">
           <UFormGroup label="Name:" name="name">
-            <UInput v-model="state.name" />
+            <UInput v-model="form.name" />
           </UFormGroup>
 
           <UButton

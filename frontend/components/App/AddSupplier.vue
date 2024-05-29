@@ -1,7 +1,7 @@
 <script setup>
 import { addSupplierSchema } from "~/schema";
 
-// Fetching suppliers from the backend
+// Fetching suppliers from the backend to display in the table
 const Suppliers = ref([]);
 const { data: suppliers } = useFetch("http://localhost:8000/supplier");
 
@@ -14,7 +14,7 @@ watch(suppliers, () => {
   }
 });
 
-//Fetch brands from the backend
+//Fetch brands from the backend to display in the checkbox
 const Brands = ref([]);
 const { data: brands } = useFetch("http://localhost:8000/product/brand");
 

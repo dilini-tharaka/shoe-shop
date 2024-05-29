@@ -194,6 +194,16 @@ product.patch("/size/:id", async (req, res) => {
   }
 });
 
+//Ger shoe category
+
+product.get("/category", async (req, res) => {
+  const categories = await prisma.category.findMany();
+  res.json({
+    message: "success",
+    data: categories,
+  });
+});
+
 //Get all shoes
 product.get("/shoe", async (req, res) => {
   try {
@@ -261,6 +271,16 @@ product.get("/shoe/:id", async (req, res) => {
 //Create a new shoe
 product.post("/shoe", async (req, res) => {
   try {
+    const categoriesData = Array.isArray(req.body.category_id)
+     ? req.body.category_id.map((cat_id: number) => ({
+          category: {
+            connect: {
+              id: cat_id,
+            },
+          },
+        }))
+      : [];
+      
     const shoe = await prisma.shoes.create({
       data: {
         brand: {
@@ -270,13 +290,13 @@ product.post("/shoe", async (req, res) => {
         },
         name: req.body.name,
         shoeshascategory: {
-          create: {
+          create: req.body.category_id.map((cat_id: number) => ({
             category: {
               connect: {
-                id: req.body.category_id,
+                id: cat_id,
               },
             },
-          },
+          })),
         },
       },
     });
