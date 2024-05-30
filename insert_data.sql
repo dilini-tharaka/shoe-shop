@@ -246,5 +246,35 @@ INSERT INTO `SupplierhasBrands` (`Brand_id`, `Supplier_id`) VALUES
 -- inner join colors on
 -- colors.id = shasclo.Colors_id
 
+Use `shoe-palace-db`;
+-- Find all products
+select * from product as p
+inner join shoeshascolors as shasc on
+p.Shoes_id = shasc.id
+inner join shoes as s on
+s.id = shasc.Shoes_id
+inner join colors as c on
+c.id = shasc.Colors_id
+inner join sizes as sz on
+sz.id = p.Sizes_id
+inner join shoeshascategory as shasct on
+shasct.Shoes_id = s.id
+inner join brand as b on
+b.id = s.brand_id
+inner join category on
+category.id = shasct.Category_id;
+
+
+-- find exssisting shoe
+select * from shoes as s
+inner join shoeshascategory as sc on
+s.id = sc.Shoes_id
+inner join brand as b on
+b.id = s.brand_id
+inner join category as c on
+c.id = sc.Category_id;
+
+
+
 
 

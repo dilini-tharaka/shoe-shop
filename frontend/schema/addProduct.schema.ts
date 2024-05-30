@@ -1,9 +1,13 @@
 import { z } from "zod";
 
 export const addProductSchema = z.object({
-  size: z.string().min(1, "Must be a valid size").max(2),
-  color: z.string().min(1, "Must be a valid color"),
-  brand: z.number().min(1,'Must select one'),
-  name: z.string().min(3,'Must be at least 3 characters'),
-  selectedSize: z.string().nonempty('Must select a size')
+  brand: z.number().min(1,'Must select one brand'),
+  size: z.number().min(1),
+  color: z.number().min(1),
+  name: z.number().min(1),
+  category: z.number().min(1),
+  selectedSize: z.string().nonempty('Must select a size'),
+  selectedColor: z.string().nonempty('Must select a color'),
+  selectedName: z.string().nonempty('Must select a name'),
+  selectedCategory: z.string().nonempty('Must select a category'),
 });

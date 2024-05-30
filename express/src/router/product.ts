@@ -222,7 +222,9 @@ product.get("/shoe", async (req, res) => {
       id: shoe.id,
       name: shoe.name,
       brand: shoe.brand.name,
-      category: shoe.shoeshascategory.map((cat) => cat.category.name).join(", "),
+      category: shoe.shoeshascategory
+        .map((cat) => cat.category.name)
+        .join(", "),
     }));
 
     res.json({
@@ -255,7 +257,6 @@ product.get("/shoe/:id", async (req, res) => {
       },
     });
 
-
     res.json({
       message: "success",
       data: shoe,
@@ -271,16 +272,6 @@ product.get("/shoe/:id", async (req, res) => {
 //Create a new shoe
 product.post("/shoe", async (req, res) => {
   try {
-    const categoriesData = Array.isArray(req.body.category_id)
-     ? req.body.category_id.map((cat_id: number) => ({
-          category: {
-            connect: {
-              id: cat_id,
-            },
-          },
-        }))
-      : [];
-      
     const shoe = await prisma.shoes.create({
       data: {
         brand: {
@@ -344,7 +335,12 @@ product.get("/", async (req, res) => {
       color: product.shoeshascolors.colors.name,
       name: product.shoeshascolors.shoes.name,
       brand: product.shoeshascolors.shoes.brand.name,
-      category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
+      category:
+        product.shoeshascolors.shoes.shoeshascategory &&
+        product.shoeshascolors.shoes.shoeshascategory.length > 0
+          ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
+          : 1, // Default value 
+      //category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
       selling_price:
         product.stockdetails.length > 0
           ? product.stockdetails[0].selling_price
@@ -404,13 +400,46 @@ product.get("/:id", async (req, res) => {
   }
 });
 
+//get shoe using shoe name,brand id and category id
+
+product.get("/shoe/:name/:brand/:category", async (req, res) => {
+  try {
+    const { name, brand, category } = req.params;
+    const shoe = await prisma.shoes.findFirst({
+      where: {
+        name: name,
+        brand_id: parseInt(brand),
+        shoeshascategory: {
+          some: {
+            Category_id: parseInt(category),
+          },
+        },
+      },
+    });
+    res.json({
+      message: "success",
+      data: shoe,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
 //Create a new product
 product.post("/", async (req, res) => {
   try {
     const existingShoe = await prisma.shoes.findFirst({
       where: {
-        name: req.body.name,
-        brand_id: req.body.brand_id,
+        name: req.body.selectedName,
+        brand_id: req.body.brand,
+        shoeshascategory:{
+          some:{
+            Category_id: req.body.category
+          }
+        }
       },
     });
 
@@ -426,14 +455,14 @@ product.post("/", async (req, res) => {
               },
               colors: {
                 connect: {
-                  id: req.body.color_id,
+                  id: req.body.color,
                 },
               },
             },
           },
           sizes: {
             connect: {
-              id: req.body.size_id,
+              id: req.body.size,
             },
           },
         },
@@ -452,22 +481,32 @@ product.post("/", async (req, res) => {
                 create: {
                   brand: {
                     connect: {
-                      id: req.body.brand_id,
+                      id: req.body.brand,
                     },
                   },
-                  name: req.body.name,
+                  name: req.body.selectedName,
+                  shoeshascategory:{
+                    create:{
+                      category:{
+                        connectOrCreate:{
+                          where: { id: req.body.category },
+                          create: { name: req.body.selectedCategory },
+                        },
+                      },
+                    },
+                  },
                 },
               },
               colors: {
                 connect: {
-                  id: req.body.color_id,
+                  id: req.body.color,
                 },
               },
             },
           },
           sizes: {
             connect: {
-              id: req.body.size_id,
+              id: req.body.size,
             },
           },
         },

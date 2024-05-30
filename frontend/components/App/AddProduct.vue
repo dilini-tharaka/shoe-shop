@@ -97,11 +97,15 @@ watch(brand, () => {
 });
 
 const form = ref({
-  size: "",
+  size: 0,
   selectedSize: "",
-  color: "",
+  color: 0,
+  selectedColor: "",
   brand: 0,
-  name: "",
+  name: 0,
+  selectedName: "",
+  category: 0,
+  selectedCategory: "",
 });
 
 // Slideover
@@ -123,7 +127,6 @@ watch(sizeData, () => {
 
     // Create an array of size
     Sizes.value = sizeData.value.data.map((size) => size.size);
-   
   } else {
     console.log("error");
     console.log(sizeData);
@@ -142,19 +145,137 @@ watch(sizeId, (newsizeID) => {
 
 //Get color for select option
 
+const colorLookup = ref({});
+const Colors = ref([]);
+const { data: colorData } = useFetch("http://localhost:8000/product/color");
 
+watch(colorData, () => {
+  if (colorData.value && colorData.value.message === "success") {
+    colorLookup.value = colorData.value.data.reduce((acc, color) => {
+      acc[color.name] = color.id;
+      return acc;
+    }, {});
+
+    // Create an array of color
+    Colors.value = colorData.value.data.map((color) => color.name);
+  } else {
+    console.log("error");
+    console.log(colorData);
+  }
+
+  const colorId = computed(() => {
+    return colorLookup.value[form.value.selectedColor] || null;
+  });
+
+  watch(colorId, (newcolorID) => {
+    form.value.color = newcolorID;
+  });
+});
+
+//////////////////////********************/////////////////////////
+
+//Get name for select option
+const nameLookup = ref({});
+const Names = ref([]);
+const { data: nameData } = useFetch("http://localhost:8000/product/shoe");
+
+watch(nameData, () => {
+  if (nameData.value && nameData.value.message === "success") {
+    nameLookup.value = nameData.value.data.reduce((acc, name) => {
+      acc[name.name] = name.id;
+      return acc;
+    }, {});
+
+    // Create an array of name
+    Names.value = nameData.value.data.map((name) => name.name);
+  } else {
+    console.log("error");
+    console.log(nameData);
+  }
+
+  const nameId = computed(() => {
+    return nameLookup.value[form.value.selectedName] || null;
+  });
+
+  watch(nameId, (newnameID) => {
+    form.value.name = newnameID;
+  });
+});
+
+//////////////////////********************/////////////////////////
+
+//Get category for select option
+const categoryLookup = ref({});
+const Categories = ref([]);
+const { data: categoryData } = useFetch(
+  "http://localhost:8000/product/category"
+);
+
+watch(categoryData, () => {
+  if (categoryData.value && categoryData.value.message === "success") {
+    categoryLookup.value = categoryData.value.data.reduce((acc, category) => {
+      acc[category.name] = category.id;
+      return acc;
+    }, {});
+
+    // Create an array of category
+    Categories.value = categoryData.value.data.map((category) => category.name);
+  } else {
+    console.log("error");
+    console.log(categoryData);
+  }
+
+  const categoryId = computed(() => {
+    return categoryLookup.value[form.value.selectedCategory] || null;
+  });
+
+  watch(categoryId, (newcategoryID) => {
+    form.value.category = newcategoryID;
+  });
+});
 
 function search() {
   console.log("Search");
 }
 
-function addProduct() {
-  console.log("Submit");
+async function addProduct() {
+  const { data } = await useFetch("http://localhost:8000/product", {
+    method: "POST",
+    body: JSON.stringify(form.value),
+  });
+
+  if (data.value && data.value.message === "success") {
+    form.value = {
+      size: 0,
+      selectedSize: "",
+      color: 0,
+      selectedColor: "",
+      brand: 0,
+      name: 0,
+      selectedName: "",
+      category: 0,
+      selectedCategory: "",
+    };
+    return alert("Product Added Successfully!");
+  } else {
+    console.log("error");
+    console.log(data);
+    return alert("Product Not Added!");
+  }
 }
 
-function clean() {
-  console.log("cancel clicking");
-  console.log(form.value);
+function cancel() {
+  form.value = {
+    size: 0,
+    selectedSize: "",
+    color: 0,
+    selectedColor: "",
+    brand: 0,
+    name: 0,
+    selectedName: "",
+    category: 0,
+    selectedCategory: "",
+  };
 }
 
 function addSize() {
@@ -249,8 +370,12 @@ function addName() {
             </USlideover>
           </div>
           <div class="flex justify-center items-center">
-            <UFormGroup label="Color:" name="color">
-              <UInput v-model="form.color" />
+            <UFormGroup label="Color:" name="selectedColor">
+              <USelectMenu
+                color="primary"
+                :options="Colors"
+                v-model="form.selectedColor"
+              />
             </UFormGroup>
             <UButton
               icon="solar:add-circle-broken"
@@ -263,6 +388,15 @@ function addName() {
             <USlideover v-model="isColor">
               <AppAddColor />
             </USlideover>
+          </div>
+          <div class="flex justify-center items-center">
+            <UFormGroup label="Category" name="selectedCategory">
+              <USelectMenu
+                color="primary"
+                :options="Categories"
+                v-model="form.selectedCategory"
+              />
+            </UFormGroup>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-4 py-3">
@@ -288,8 +422,12 @@ function addName() {
           </USlideover>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <UFormGroup label="Name:" name="name">
-            <UInput v-model="form.name" />
+          <UFormGroup label="Name:" name="selectedName">
+            <USelectMenu
+              color="primary"
+              :options="Names"
+              v-model="form.selectedName"
+            />
           </UFormGroup>
 
           <UButton
@@ -304,7 +442,7 @@ function addName() {
           </USlideover>
           <div class="flex justify-center gap-6 px-2">
             <UButton type="submit" class="my-5">Add a Product</UButton>
-            <UButton class="my-5" color="gray" variant="solid" @click="clean"
+            <UButton class="my-5" color="gray" variant="solid" @click="cancel"
               >Cancel</UButton
             >
           </div>
