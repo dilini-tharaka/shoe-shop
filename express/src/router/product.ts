@@ -120,7 +120,11 @@ product.post("/color", async (req, res) => {
 
 //Get all sizes
 product.get("/size", async (req, res) => {
-  const sizes = await prisma.sizes.findMany();
+  const sizes = await prisma.sizes.findMany({
+    orderBy: {
+      size: "asc",
+    },
+  });
   res.json({
     message: "success",
     data: sizes,
@@ -361,6 +365,30 @@ product.get("/", async (req, res) => {
   }
 });
 
+//Get next product id
+product.get("/nextid", async (req, res) => {
+  try {
+    const productID = await prisma.product.aggregate({
+      _max: {
+        id: true,
+      },
+    });
+
+    const nextId = (productID._max.id || 0) + 1;
+
+    res.json({
+      message: "success",
+      data: nextId,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+
 //Get product by id
 product.get("/:id", async (req, res) => {
   try {
@@ -400,33 +428,6 @@ product.get("/:id", async (req, res) => {
   }
 });
 
-//get shoe using shoe name,brand id and category id
-
-product.get("/shoe/:name/:brand/:category", async (req, res) => {
-  try {
-    const { name, brand, category } = req.params;
-    const shoe = await prisma.shoes.findFirst({
-      where: {
-        name: name,
-        brand_id: parseInt(brand),
-        shoeshascategory: {
-          some: {
-            Category_id: parseInt(category),
-          },
-        },
-      },
-    });
-    res.json({
-      message: "success",
-      data: shoe,
-    });
-  } catch (error: any) {
-    res.json({
-      message: "error",
-      data: error.message,
-    });
-  }
-});
 
 //Create a new product
 product.post("/", async (req, res) => {

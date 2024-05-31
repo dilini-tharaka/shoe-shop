@@ -77,6 +77,8 @@ const rows = computed(() => {
   return shoe.value.slice((page.value - 1) * pageCount, page.value * pageCount);
 });
 
+//////////////////////////*******************/////////////////////////
+
 // Add Product using radio button
 const Brands = ref([]);
 
@@ -113,6 +115,8 @@ const isSize = ref(false);
 const isColor = ref(false);
 const isBrand = ref(false);
 const isName = ref(false);
+
+//////////////////////********************/////////////////////////
 
 //Get size for select option
 const SizeLookup = ref({});
@@ -234,6 +238,16 @@ watch(categoryData, () => {
   });
 });
 
+//////////////////////********************/////////////////////////
+//Get next id for product
+const id = ref(0);
+onMounted(async () => {
+  const { data: nextId } = await useFetch("http://localhost:8000/product/nextid");
+  //console.log(nextId.value.data);
+  id.value = nextId.value.data;
+});
+
+//////////////////////********************/////////////////////////
 function search() {
   console.log("Search");
 }
@@ -346,7 +360,7 @@ function addName() {
 
         <div class="flex flex-row gap-16 items-center">
           <UFormGroup label="ID:">
-            <UBadge color="primary" variant="soft">182393</UBadge>
+            <UBadge color="primary" variant="soft">{{ id }}</UBadge>
           </UFormGroup>
 
           <div class="flex justify-center items-center">
