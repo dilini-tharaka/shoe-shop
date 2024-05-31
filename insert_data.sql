@@ -82,9 +82,8 @@ INSERT INTO `Supplier` (`name`, `email`, `mobile`, `nic`, `address`, `created_at
 -- Table `Brand`
 -- -----------------------------------------------------
 INSERT INTO `Brand` (`name`) VALUES 
-('Brand A'),
-('Brand B'),
-('Brand C');
+('Puma'),
+('Adidas');
 
 -- -----------------------------------------------------
 -- Table `Colors`
@@ -143,11 +142,9 @@ INSERT INTO `ShoesHasColors` (`Shoes_id`, `Colors_id`) VALUES
 -- Table `Sizes`
 -- -----------------------------------------------------
 INSERT INTO `Sizes` (`length`, `size`) VALUES 
-('10 cm', '22'),
-('20 cm', '33'),
-('30 cm', '38'),
-('40 cm', '41'),
-('50 cm', '46');
+('10', '22'),
+('20', '33'),
+('30', '38');
 
 -- -----------------------------------------------------
 -- Table `Product`
@@ -163,9 +160,7 @@ INSERT INTO `Product` (`Shoes_id`, `selling_count`, `Sizes_id`) VALUES
 -- Table `Stock`
 -- -----------------------------------------------------
 INSERT INTO `stock` (`bought_at`, `stock_value`, `paid_amount`, `Supplier_id`, `StockManager_id`) VALUES 
-(NOW(), 500.00, 450.00, 1, 1),
-(NOW(), 600.00, 550.00, 2, 2),
-(NOW(), 700.00, 650.00, 3, 1);
+(NOW(), 500.00, 450.00, 1, 1);
 
 
 -- -----------------------------------------------------
@@ -173,8 +168,7 @@ INSERT INTO `stock` (`bought_at`, `stock_value`, `paid_amount`, `Supplier_id`, `
 -- -----------------------------------------------------
 INSERT INTO `StockDetails` (`qty`, `buying_price`, `selling_price`, `barcode`, `Stock_id`, `Product_id`) VALUES 
 (100, 5.00, 10.00, '123456789012', 1, 1),
-(200, 6.00, 12.00, '234567890123', 2, 2),
-(300, 7.00, 14.00, '345678901234', 3, 3);
+(200, 6.00, 12.00, '234567890123', 1, 2);
 
 -- -----------------------------------------------------
 -- Table `Orders`
@@ -207,16 +201,13 @@ INSERT INTO `Images` (`path`, `Product_id`) VALUES
 -- -----------------------------------------------------
 INSERT INTO `Invoice` (`Invoice_at`, `Cashier_id`) VALUES 
 (NOW(), 1),
-(NOW(), 1), 
 (NOW(), 1);
-
 -- -----------------------------------------------------
 -- Table `InvoiceItem`
 -- -----------------------------------------------------
 INSERT INTO `InvoiceItem` (`qty`, `total`, `StockDetails_id`, `Invoice_id`) VALUES 
-(1, 10.00, 1, 4),
-(2, 24.00, 2, 5),
-(3, 42.00, 3, 6);   
+(1, 10.00, 1, 1),
+(2, 24.00, 2, 1);
 
 -- -----------------------------------------------------
 -- Table `SupplierhasBrands`

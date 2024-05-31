@@ -8,23 +8,20 @@ const prisma = new PrismaClient();
 invoice.get("/", async (req, res) => {
   try {
     const invoices = await prisma.invoice.findMany({
-      select: {
-        id: true,
-        Invoice_at: true,
-        Cashier_id: true,
-        invoiceitem: {
+      include: {
+        cashier: {
           select: {
-            id: true,
-            qty: true,
-            total: true,
+            name: true,
+          },
+        },
+        invoiceitem: {
+          include: {
             stockdetails: {
-              select: {
-                selling_price: true,
-                barcode: true,
+              include: {
                 product: {
-                  select: {
+                  include: {
                     shoeshascolors: {
-                      select: {
+                      include: {
                         shoes: {
                           select: {
                             name: true,
@@ -38,17 +35,90 @@ invoice.get("/", async (req, res) => {
             },
           },
         },
-        cashier: {
-          select: {
-            name: true,
-          },
-        },
       },
     });
+
+    const invoiceData = invoices.map((invoice) => ({
+      id: invoice.id,
+      cashier: invoice.cashier.name,
+      discount: invoice.discount,
+      invoice_at: invoice.Invoice_at,
+      invoiceitem: invoice.invoiceitem.map((item) => ({
+        id: item.id,
+        qty: item.qty,
+        total: item.total,
+        stockdetails: {
+          selling_price: item.stockdetails.selling_price,
+          barcode: item.stockdetails.barcode,
+          product: {
+            name: item.stockdetails.product.shoeshascolors.shoes.name,
+          },
+        },
+      })),
+    }));
     res.json({
       message: "success",
-      data: invoices,
+      data: invoiceData,
     });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//Get shoe name, selling price , discount using stockdetails id
+invoice.post("/stockdetails", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const stockdetails = await prisma.stockdetails.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        product: {
+          include: {
+            shoeshascolors: {
+              include: {
+                shoes: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        invoiceitem:{
+          select:{
+            invoice:{
+              select:{
+                discount:true
+              }
+            }
+          } 
+        }
+      },
+    });
+
+    if (!stockdetails) {
+      res.json({
+        message: "Stockdetails not found for the given id",
+      });
+      return;
+    }
+
+    const stockdetailsData = {
+      name: stockdetails.product.shoeshascolors.shoes.name,
+      price: stockdetails.selling_price,
+      discount: stockdetails.invoiceitem[0].invoice.discount,
+    };
+    res.json({
+      message: "success",
+      data: stockdetailsData,
+    });
+    
   } catch (error: any) {
     res.json({
       message: "error",
@@ -65,23 +135,20 @@ invoice.get("/:id", async (req, res) => {
       where: {
         id: parseInt(id),
       },
-      select: {
-        id: true,
-        Invoice_at: true,
-        Cashier_id: true,
-        invoiceitem: {
+      include: {
+        cashier: {
           select: {
-            id: true,
-            qty: true,
-            total: true,
+            name: true,
+          },
+        },
+        invoiceitem: {
+          include: {
             stockdetails: {
-              select: {
-                selling_price: true,
-                barcode: true,
+              include: {
                 product: {
-                  select: {
+                  include: {
                     shoeshascolors: {
-                      select: {
+                      include: {
                         shoes: {
                           select: {
                             name: true,
@@ -95,16 +162,38 @@ invoice.get("/:id", async (req, res) => {
             },
           },
         },
-        cashier: {
-          select: {
-            name: true,
-          },
-        },
       },
     });
+
+    if (!invoice) {
+      res.json({
+        message: "Invoice not found",
+      });
+      return;
+    }
+
+    const invoiceData = {
+      id: invoice.id,
+      cashier: invoice.cashier.name,
+      discount: invoice.discount,
+      invoice_at: invoice.Invoice_at,
+      invoiceitem: invoice.invoiceitem.map((item) => ({
+        id: item.id,
+        qty: item.qty,
+        total: item.total,
+        stockdetails: {
+          selling_price: item.stockdetails.selling_price,
+          barcode: item.stockdetails.barcode,
+          product: {
+            name: item.stockdetails.product.shoeshascolors.shoes.name,
+          },
+        },
+      })),
+    };
+    
     res.json({
       message: "success",
-      data: invoice,
+      data: invoiceData,
     });
   } catch (error: any) {
     res.json({

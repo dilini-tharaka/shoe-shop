@@ -109,10 +109,12 @@ user.get("/role/:role", async (req, res) => {
     });
   }
 });
+
 // create user
 user.post("/", async (req, res) => {
   try {
-    const { firstName, lastName} = req.body;
+    const { firstName, lastName } = req.body;
+    const role_id = req.body.role_id;
 
     // Get name by concatenating firstname and lastname
     const name = `${firstName} ${lastName}`;
@@ -132,6 +134,61 @@ user.post("/", async (req, res) => {
         },
       },
     });
+
+    // Update the relevant role-specific table based on the role_id
+    switch (role_id) {
+      case 1: // Admin
+        await prisma.admin.create({
+          data: {
+            name: name,
+            mobile: req.body.mobile,
+            nic: req.body.nic,
+            email: req.body.email,
+            username: req.body.userName,
+            password: req.body.password,
+          },
+        });
+        break;
+      case 2: // Stock Manager
+        await prisma.stockmanager.create({
+          data: {
+            name: name,
+            mobile: req.body.mobile,
+            nic: req.body.nic,
+            email: req.body.email,
+            userName: req.body.userName,
+            password: req.body.password,
+          },
+        });
+        break;
+      case 3: // Assistant
+        await prisma.assistant.create({
+          data: {
+            name: name,
+            mobile: req.body.mobile,
+            nic: req.body.nic,
+            email: req.body.email,
+            username: req.body.userName,
+            password: req.body.password,
+          },
+        });
+        break;
+      case 4: // Cashier
+        await prisma.cashier.create({
+          data: {
+            name: name,
+            mobile: req.body.mobile,
+            nic: req.body.nic,
+            email: req.body.email,
+            userName: req.body.userName,
+            password: req.body.password,
+          },
+        });
+        break;
+      default:
+        throw new Error("Invalid role_id");
+    }
+
     res.json({
       message: "success",
       data: employee,

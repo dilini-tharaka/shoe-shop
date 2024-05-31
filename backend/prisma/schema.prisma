@@ -218,6 +218,7 @@ model stockdetails {
   buying_price  Float
   selling_price Float
   barcode       String        @db.VarChar(255)
+  discount      Int           @default(0)
   Product_id    Int
   Stock_id      Int
   invoiceitem   invoiceitem[]

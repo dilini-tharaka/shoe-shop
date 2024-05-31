@@ -91,6 +91,7 @@ model invoice {
   id          Int           @id @default(autoincrement())
   Invoice_at  DateTime      @db.Timestamp(0)
   Cashier_id  Int
+  discount    Int           @default(5)
   cashier     cashier       @relation(fields: [Cashier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Invoice_Cashier1")
   invoiceitem invoiceitem[]
 

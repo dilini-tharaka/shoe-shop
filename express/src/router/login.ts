@@ -13,10 +13,10 @@ login.get("/", async (req, res) => {
   });
 });
 
-//For login
+//login for Customer
 login.post("/", async (req, res) => {
   try {
-    const user = await prisma.user.findMany({
+    const user = await prisma.customer.findMany({
       where: {
         email: req.body.email,
         password: req.body.password,

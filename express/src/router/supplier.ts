@@ -7,10 +7,32 @@ const prisma = new PrismaClient();
 //get all suppliers
 supplier.get("/", async (req, res) => {
   try {
-    const suppliers = await prisma.supplier.findMany();
+    const suppliers = await prisma.supplier.findMany({
+      include: {
+        bankdetails: true,
+        supplierhasbrands: {
+          include: {
+            brand: true,
+          },
+        },
+      },
+    });
+
+    const suppliersWithBrands = suppliers.map((supplier) => ({
+      id: supplier.id,
+      name: supplier.name,
+      email: supplier.email,
+      mobile: supplier.mobile,
+      nic: supplier.nic,
+      address: supplier.address,
+      bankdetails: supplier.bankdetails,
+      brands: supplier.supplierhasbrands.map((supplierhasbrand) => {
+        return supplierhasbrand.brand.name;
+      }),
+    })); 
     res.json({
       message: "success",
-      data: suppliers,
+      data: suppliersWithBrands,
     });
   } catch (error: any) {
     res.json({
@@ -74,7 +96,7 @@ supplier.post("/", async (req, res) => {
         },
       },
     });
-    console.log(req.body);
+    //console.log(req.body);
     res.json({
       message: "success",
       data: supplier,
@@ -107,6 +129,7 @@ supplier.get("/:id", async (req, res) => {
     });
   }
 });
+
 //get suppliers using name
 supplier.get("/name/:name", async (req, res) => {
   try {
