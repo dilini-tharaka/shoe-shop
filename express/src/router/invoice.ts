@@ -90,15 +90,15 @@ invoice.post("/stockdetails", async (req, res) => {
             },
           },
         },
-        invoiceitem:{
-          select:{
-            invoice:{
-              select:{
-                discount:true
-              }
-            }
-          } 
-        }
+        invoiceitem: {
+          select: {
+            invoice: {
+              select: {
+                discount: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -118,7 +118,6 @@ invoice.post("/stockdetails", async (req, res) => {
       message: "success",
       data: stockdetailsData,
     });
-    
   } catch (error: any) {
     res.json({
       message: "error",
@@ -190,7 +189,7 @@ invoice.get("/:id", async (req, res) => {
         },
       })),
     };
-    
+
     res.json({
       message: "success",
       data: invoiceData,
@@ -206,26 +205,45 @@ invoice.get("/:id", async (req, res) => {
 //Create new invoice
 invoice.post("/", async (req, res) => {
   try {
-    const invoice = await prisma.invoice.create({
-      data: {
-        Invoice_at: new Date(),
-        Cashier_id: req.body.Cashier_id,
-        invoiceitem: {
-          create: req.body.invoiceitem.map((item: any) => ({
-            qty: item.qty,
-            total: item.total,
-            stockdetails: {
-              connect: {
-                id: item.stockdetails_id,
-              },
-            },
-          })),
+    const result = await prisma.$transaction(async (prisma) => {
+      //create new invoice
+      const newInvoice = await prisma.invoice.create({
+        data: {
+          Invoice_at: new Date(),
+          Cashier_id: req.body.Cashier_id,
         },
-      },
+      });
+
+      //Add invoice items
+      const invoiceItems = req.body.invoiceitem.map((item: any) => {
+        return {
+          qty: item.qty,
+          total: item.amount,
+          StockDetails_id: item.id,
+          Invoice_id: newInvoice.id,
+        };
+      });
+
+      //Create invoice items
+      await prisma.invoiceitem.createMany({
+        data: invoiceItems,
+      });
+
+      //Update stock Quantity
+      const stockUpdates = invoiceItems.map((item: any) =>
+        prisma.stockdetails.update({
+          where: { id: item.StockDetails_id },
+          data: { qty: { decrement: item.qty } },
+        })
+      );
+
+      await Promise.all(stockUpdates);
+      return newInvoice;
     });
+
     res.json({
       message: "success",
-      data: invoice,
+      data: result,
     });
   } catch (error: any) {
     res.json({
