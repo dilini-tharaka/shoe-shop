@@ -143,7 +143,7 @@ async function print() {
   btnDisabled.value = true;
 
   const printData = ref({
-    Cashier_id: 1,
+    Cashier_id: 1, // Need to change
     invoiceitem: purchesedItems.value.map((item) => {
       return {
         id: parseInt(item.id),
@@ -157,22 +157,33 @@ async function print() {
 
   console.log(printData.value);
 
-  // const { data: addinvoice } = await useFetch("http://localhost:8000/invoice", {
-  //   method: "POST",
-  //   body: JSON.stringify(printData.value),
-  // });
+  const { data: addinvoice } = await useFetch("http://localhost:8000/invoice", {
+    method: "POST",
+    body: JSON.stringify(printData.value),
+  });
 
-  // if (addinvoice.value && addinvoice.value.message === "success") {
-  //   alert("Invoice Added Successfully");
-  //   purchesedItems.value = [];
-  //   btnDisabled.value = false;
-  //   paidAmount.value = 0;
-  //   discountPrecentage.value = 0;
-  // } else {
-  //   console.log(addinvoice.value.data);
-  //   alert("Invoice Adding Failed");
-  //   btnDisabled.value = false;
-  // }
+  if (addinvoice.value && addinvoice.value.message === "success") {
+    alert(`Invoice Added Successfully!
+    casheir ID: ${printData.value.Cashier_id}
+    Invoice ID: ${addinvoice.value.data.id}
+    items: ${purchesedItems.value.map((item) => {
+      return `ID: ${item.id} Qty: ${item.quantity} Amount: ${item.amount}`;
+    })}
+    Total: ${total.value}
+    Discount: ${discount.value}
+    Net Total: ${netTotal.value}
+    Paid Amount: ${paidAmount.value}
+    Change: ${parseFloat(paidAmount.value - netTotal.value).toFixed(2)}
+    `);
+    purchesedItems.value = [];
+    btnDisabled.value = false;
+    paidAmount.value = 0;
+    discountPrecentage.value = 0;
+  } else {
+    console.log(addinvoice.value.data);
+    alert("Invoice Adding Failed");
+    btnDisabled.value = false;
+  }
 }
 </script>
 
