@@ -1,8 +1,9 @@
 <script setup>
 const shoes = ref([
   {
+    id: 1,
     wished: false,
-    image: "/img/register.jpg",
+    image: "/img/shoes/shoe01.jpg",
     name: "Nike Air Max",
     brand: "Nike",
     price: 1000.0,
@@ -12,54 +13,51 @@ const shoes = ref([
       { available: true, size: 13 },
     ],
   },
-
-  {
-    wished: false,
-    image: "/img/register.jpg",
-    name: "Adidas Superstar",
-    brand: "Adidas",
-    price: 800.0,
-    sizes: [
-      { available: true, size: 23 },
-      { available: true, size: 34 },
-      { available: true, size: 13 },
-    ],
-  },
-  {
-    wished: false,
-    image: "/img/register.jpg",
-    name: "Puma Suede",
-    brand: "Puma",
-    price: 700.0,
-    sizes: [
-      { available: true, size: 23 },
-      { available: true, size: 34 },
-      { available: true, size: 13 },
-    ],
-  },
 ]);
 
-function toggleWish() {
-  shoes.wished = !shoes.wished;
-  console.log(shoes.wished);
+const productCard = ref([]);
+const { data: cardDetails } = useFetch("http://localhost:8000/product/card");
+
+watch(cardDetails, () => {
+  if (cardDetails) {
+    productCard.value = cardDetails.value.data;
+    console.log(productCard.value);
+  } else {
+    console.log("error");
+    console.log(cardDetails);
+  }
+});
+
+function toggleWish(index) {
+  console.log(index);
+  shoes.value[index].wished = !shoes.value[index].wished;
+  console.log(shoes.value[index].wished);
 }
 
 const wishedIcon = computed(() => {
-  return shoes.wished ? "solar:heart-angle-bold" : "solar:heart-angle-outline";
+  return shoes.value.map((shoe, index) => {
+    return shoe.wished ? "solar:heart-angle-bold" : "solar:heart-angle-outline";
+  });
 });
 </script>
 
 <template>
   <div
     class="w-80 h-96 flex flex-col rounded bg-bkg-primary shadow-lg dark:shadow-black"
-    v-for="shoe in shoes"
+    v-for="(shoe, index) in shoes"
+    :key="shoe.index"
   >
-    <div class="w-full h-1/2 bg-[url(/img/register.jpg)] bg-center bg-contain">
+    <div
+      v-for="(shoe, index) in shoes"
+      :key="shoe.id"
+      :class="'w-full h-1/2 bg-center bg-cover bg-no-repeat'"
+      :style="{ backgroundImage: `url(${shoe.image})` }"
+    >
       <UButton
-        :icon="wishedIcon"
+        :icon="wishedIcon[index]"
         color="gray"
         variant="ghost"
-        @click="toggleWish"
+        @click="toggleWish(index)"
       />
     </div>
     <div class="flex flex-col gap-2 p-2">

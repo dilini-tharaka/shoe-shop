@@ -343,7 +343,7 @@ product.get("/", async (req, res) => {
         product.shoeshascolors.shoes.shoeshascategory &&
         product.shoeshascolors.shoes.shoeshascategory.length > 0
           ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
-          : 1, // Default value 
+          : 1, // Default value
       //category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
       selling_price:
         product.stockdetails.length > 0
@@ -356,6 +356,63 @@ product.get("/", async (req, res) => {
     res.json({
       message: "success",
       data: ordererProducts,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//Get Product Card Details
+product.get("/card", async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        sizes: { select: { size: true, length: true } },
+        images: { select: { path: true } },
+        shoeshascolors: {
+          include: {
+            colors: { select: { name: true } },
+            shoes: {
+              include: {
+                brand: { select: { name: true } },
+                shoeshascategory: {
+                  include: {
+                    category: { select: { name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+        stockdetails: { select: { selling_price: true, qty: true } },
+      },
+    });
+
+    const formattedProducts = products.map((product) => ({
+      id: product.id,
+      img: product.images[0].path,
+      name: product.shoeshascolors.shoes.name,
+      brand: product.shoeshascolors.shoes.brand.name,
+      category: product.shoeshascolors.shoes.shoeshascategory.map(
+        (cat) => cat.category.name
+      ),
+
+      size: [
+        {
+          size: product.sizes.size,
+          length: product.sizes.length,
+          color: product.shoeshascolors.colors.name,
+          price: product.stockdetails[0].selling_price || 0,
+          available: product.stockdetails[0].qty || 0,
+        },
+      ],
+    }));
+    res.json({
+      message: "success",
+      data: formattedProducts,
     });
   } catch (error: any) {
     res.json({
@@ -387,7 +444,6 @@ product.get("/nextid", async (req, res) => {
     });
   }
 });
-
 
 //Get product by id
 product.get("/:id", async (req, res) => {
@@ -428,7 +484,6 @@ product.get("/:id", async (req, res) => {
   }
 });
 
-
 //Create a new product
 product.post("/", async (req, res) => {
   try {
@@ -436,11 +491,11 @@ product.post("/", async (req, res) => {
       where: {
         name: req.body.selectedName,
         brand_id: req.body.brand,
-        shoeshascategory:{
-          some:{
-            Category_id: req.body.category
-          }
-        }
+        shoeshascategory: {
+          some: {
+            Category_id: req.body.category,
+          },
+        },
       },
     });
 
@@ -486,10 +541,10 @@ product.post("/", async (req, res) => {
                     },
                   },
                   name: req.body.selectedName,
-                  shoeshascategory:{
-                    create:{
-                      category:{
-                        connectOrCreate:{
+                  shoeshascategory: {
+                    create: {
+                      category: {
+                        connectOrCreate: {
                           where: { id: req.body.category },
                           create: { name: req.body.selectedCategory },
                         },
