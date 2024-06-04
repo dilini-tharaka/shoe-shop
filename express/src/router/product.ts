@@ -328,7 +328,7 @@ product.get("/", async (req, res) => {
             },
           },
         },
-        stockdetails: { select: { selling_price: true } },
+        stockdetails: true,
       },
     });
 
@@ -366,6 +366,7 @@ product.get("/", async (req, res) => {
 });
 
 //Get Product Card Details
+
 product.get("/card", async (req, res) => {
   try {
     const products = await prisma.product.findMany({
@@ -387,29 +388,67 @@ product.get("/card", async (req, res) => {
             },
           },
         },
-        stockdetails: { select: { selling_price: true, qty: true } },
+        stockdetails: {
+          select: { selling_price: true, qty: true, Product_id: true },
+        },
       },
     });
 
-    const formattedProducts = products.map((product) => ({
-      id: product.id,
-      img: product.images[0].path,
-      name: product.shoeshascolors.shoes.name,
-      brand: product.shoeshascolors.shoes.brand.name,
-      category: product.shoeshascolors.shoes.shoeshascategory.map(
-        (cat) => cat.category.name
-      ),
+    // Map each product to the desired output format
+    interface SizeDetail {
+      size: string;
+      length: string;
+      color: string;
+      price: number;
+      available: number;
+    }
+    
+    interface Product {
+      id: number;
+      wished: boolean;
+      image: string;
+      name: string;
+      brand: string;
+      category: string[];
+      sizes: SizeDetail[];
+    }
+    
+    
+    interface ProductMap {
+      [key: string]: Product;
+    }
+    
+    const productMap:ProductMap = {};
+    //Build a map of products by brand and name
+    products.forEach((product) => {
+      const stockDetail = product.stockdetails[0] || {};
+      const key = `${product.shoeshascolors.shoes.brand.name}-${product.shoeshascolors.shoes.name}`;
 
-      size: [
-        {
-          size: product.sizes.size,
-          length: product.sizes.length,
-          color: product.shoeshascolors.colors.name,
-          price: product.stockdetails[0].selling_price || 0,
-          available: product.stockdetails[0].qty || 0,
-        },
-      ],
-    }));
+      if (!productMap[key]) {
+        productMap[key] = {
+          id: product.id,
+          wished: false, // Default value
+          image: product.images[0]?.path || "default.jpg",
+          name: product.shoeshascolors.shoes.name,
+          brand: product.shoeshascolors.shoes.brand.name,
+          category: product.shoeshascolors.shoes.shoeshascategory.map(
+            (cat) => cat.category.name
+          ),
+          sizes: []
+        };
+      }
+
+      productMap[key].sizes.push({
+        size: product.sizes.size,
+        length: product.sizes.length,
+        color: product.shoeshascolors.colors.name,
+        price: stockDetail.selling_price || 0,
+        available: stockDetail.qty || 0,
+      });
+    });
+
+    const formattedProducts = Object.values(productMap);
+
     res.json({
       message: "success",
       data: formattedProducts,
@@ -421,6 +460,7 @@ product.get("/card", async (req, res) => {
     });
   }
 });
+
 
 //Get next product id
 product.get("/nextid", async (req, res) => {

@@ -1,37 +1,22 @@
 <script setup>
-const shoes = ref([
-  {
-    id: 1,
-    wished: false,
-    image: "/img/shoes/shoe01.jpg",
-    name: "Nike Air Max",
-    brand: "Nike",
-    price: 1000.0,
-    sizes: [
-      { available: true, size: 23 },
-      { available: true, size: 34 },
-      { available: true, size: 13 },
-    ],
-  },
-]);
+const path = "/img/shoes/";
 
-const productCard = ref([]);
+const shoes = ref([]);
 const { data: cardDetails } = useFetch("http://localhost:8000/product/card");
 
 watch(cardDetails, () => {
-  if (cardDetails) {
-    productCard.value = cardDetails.value.data;
-    console.log(productCard.value);
+  if (cardDetails.value.message === "success") {
+    shoes.value = cardDetails.value.data;
+    console.log(shoes.value);
   } else {
     console.log("error");
     console.log(cardDetails);
   }
 });
+////////////////////////////////////////
 
 function toggleWish(index) {
-  console.log(index);
   shoes.value[index].wished = !shoes.value[index].wished;
-  console.log(shoes.value[index].wished);
 }
 
 const wishedIcon = computed(() => {
@@ -39,6 +24,10 @@ const wishedIcon = computed(() => {
     return shoe.wished ? "solar:heart-angle-bold" : "solar:heart-angle-outline";
   });
 });
+
+function getPrice(size, index) {
+  shoes.value[index].price = size.price;
+}
 </script>
 
 <template>
@@ -48,10 +37,8 @@ const wishedIcon = computed(() => {
     :key="shoe.index"
   >
     <div
-      v-for="(shoe, index) in shoes"
-      :key="shoe.id"
       :class="'w-full h-1/2 bg-center bg-cover bg-no-repeat'"
-      :style="{ backgroundImage: `url(${shoe.image})` }"
+      :style="{ backgroundImage: `url(${path + shoe.image})` }"
     >
       <UButton
         :icon="wishedIcon[index]"
@@ -69,11 +56,18 @@ const wishedIcon = computed(() => {
       <div class="flex">
         <h2>Size(UK)</h2>
         <div
-          class="flex flex-wrap gap-4 pt-1 p-1"
-          v-for="{ available, size } in shoes.sizes"
+          class="flex flex-wrap gap-5 pt-1 p-1"
+          v-for="size in shoe.sizes"
+          :key="size.size"
         >
-          <UChip color="green">
-            <h1>{{ size }}</h1>
+          <UChip :color="size.available ? 'green' : 'red'">
+            <UBadge
+              color="primary"
+              variant="soft"
+              class="cursor-pointer"
+              @click="getPrice(size, index)"
+              >{{ size.size }}</UBadge
+            >
           </UChip>
         </div>
       </div>
