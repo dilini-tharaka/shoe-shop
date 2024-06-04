@@ -1,6 +1,7 @@
 <script setup>
 import { addProductSchema } from "~/schema";
 
+let btnDisabled = ref(false);
 // Filter
 const filterOption = ["Filter Option", "Brand", "Color", "Size", "ID", "Name"];
 const selected = ref(filterOption[0]);
@@ -185,13 +186,35 @@ const { data: nameData } = useFetch("http://localhost:8000/product/shoe");
 
 watch(nameData, () => {
   if (nameData.value && nameData.value.message === "success") {
-    nameLookup.value = nameData.value.data.reduce((acc, name) => {
-      acc[name.name] = name.id;
+    //   nameLookup.value = nameData.value.data.reduce((acc, name) => {
+    //     acc[name.name] = name.id;
+    //     return acc;
+    //   }, {});
+
+    //   // Create an array of name
+    //   Names.value = nameData.value.data.map((name) => name.name);
+    // } else {
+    //   console.log("error");
+    //   console.log(nameData);
+    // }
+    const uniqueNames = new Set();
+    const uniqueShoes = [];
+
+    // Process data to filter unique names
+    nameData.value.data.forEach((shoe) => {
+      if (!uniqueNames.has(shoe.name)) {
+        uniqueNames.add(shoe.name);
+        uniqueShoes.push(shoe);
+      }
+    });
+
+    // Populate nameLookup and Names
+    nameLookup.value = uniqueShoes.reduce((acc, shoe) => {
+      acc[shoe.name] = shoe.id;
       return acc;
     }, {});
 
-    // Create an array of name
-    Names.value = nameData.value.data.map((name) => name.name);
+    Names.value = uniqueShoes.map((shoe) => shoe.name);
   } else {
     console.log("error");
     console.log(nameData);
@@ -242,7 +265,9 @@ watch(categoryData, () => {
 //Get next id for product
 const id = ref(0);
 onMounted(async () => {
-  const { data: nextId } = await useFetch("http://localhost:8000/product/nextid");
+  const { data: nextId } = await useFetch(
+    "http://localhost:8000/product/nextid"
+  );
   //console.log(nextId.value.data);
   id.value = nextId.value.data;
 });
@@ -253,6 +278,7 @@ function search() {
 }
 
 async function addProduct() {
+  btnDisabled.value = true;
   const { data } = await useFetch("http://localhost:8000/product", {
     method: "POST",
     body: JSON.stringify(form.value),
@@ -270,10 +296,12 @@ async function addProduct() {
       category: 0,
       selectedCategory: "",
     };
+    btnDisabled.value = false;
     return alert("Product Added Successfully!");
   } else {
     console.log("error");
     console.log(data);
+    btnDisabled.value = false;
     return alert("Product Not Added!");
   }
 }
@@ -455,7 +483,7 @@ function addName() {
             <AppAddName />
           </USlideover>
           <div class="flex justify-center gap-6 px-2">
-            <UButton type="submit" class="my-5">Add a Product</UButton>
+            <UButton type="submit" class="my-5" :disabled="btnDisabled">Add a Product</UButton>
             <UButton class="my-5" color="gray" variant="solid" @click="cancel"
               >Cancel</UButton
             >

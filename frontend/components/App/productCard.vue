@@ -56,7 +56,7 @@ function getPrice(size, index) {
       <div class="flex">
         <h2>Size(UK)</h2>
         <div
-          class="flex flex-wrap gap-5 pt-1 p-1"
+          class="flex flex-wrap gap-5 pt-1 p-1 pb-2"
           v-for="size in shoe.sizes"
           :key="size.size"
         >
@@ -71,7 +71,7 @@ function getPrice(size, index) {
           </UChip>
         </div>
       </div>
-      <div class="flex gap-4 justify-center items-center">
+      <div class="flex gap-4 justify-center items-center pt-2">
         <UChip color="green"> <h6>Available</h6></UChip>
         <UChip color="red"> <h6>Out Of Stock</h6></UChip>
       </div>

@@ -173,7 +173,7 @@ async function print() {
     Discount: ${discount.value}
     Net Total: ${netTotal.value}
     Paid Amount: ${paidAmount.value}
-    Change: ${parseFloat(paidAmount.value - netTotal.value).toFixed(2)}
+    Change: ${parseFloat(paidAmount.value - netTotal.value).toFixed(2)}=
     `);
     purchesedItems.value = [];
     btnDisabled.value = false;
