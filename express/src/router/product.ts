@@ -328,34 +328,67 @@ product.get("/", async (req, res) => {
             },
           },
         },
-        stockdetails: true,
+        stockdetails: {
+          orderBy: {
+            id: "asc",
+          },
+        },
       },
     });
 
-    const ordererProducts = products.map((product) => ({
-      id: product.id,
-      size: product.sizes.size,
-      length: product.sizes.length,
-      color: product.shoeshascolors.colors.name,
-      name: product.shoeshascolors.shoes.name,
-      brand: product.shoeshascolors.shoes.brand.name,
-      category:
-        product.shoeshascolors.shoes.shoeshascategory &&
-        product.shoeshascolors.shoes.shoeshascategory.length > 0
-          ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
-          : 1, // Default value
-      //category: product.shoeshascolors.shoes.shoeshascategory[0].category.name,
-      selling_price:
-        product.stockdetails.length > 0
-          ? product.stockdetails[0].selling_price
-          : 0,
+    // const ordererProducts = products.map((product) => ({
+    //   id: product.id,
+    //   size: product.sizes.size,
+    //   length: product.sizes.length,
+    //   color: product.shoeshascolors.colors.name,
+    //   name: product.shoeshascolors.shoes.name,
+    //   brand: product.shoeshascolors.shoes.brand.name,
+    //   category:
+    //     product.shoeshascolors.shoes.shoeshascategory &&
+    //     product.shoeshascolors.shoes.shoeshascategory.length > 0
+    //       ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
+    //       : 1, // Default value
+    //   selling_price:
+    //     product.stockdetails.length > 0
+    //       ? product.stockdetails[0].selling_price
+    //       : 0,
+    //   qty: product.stockdetails.length > 0 ? product.stockdetails[0].qty : 0,
+    // }));
 
-      // category: product.shoeshascolors.shoes.shoeshascategory.map(cat => cat.category.name).join(", ")
-    }));
+    const orderedProducts = products.map((product) => {
+      let currentStockIndex = 0;
+      while (
+        currentStockIndex < product.stockdetails.length &&
+        product.stockdetails[currentStockIndex].qty === 0
+      ) {
+        currentStockIndex++; // Find the next available stock
+      }
+
+      const currentStockDetail = product.stockdetails[currentStockIndex];
+
+      return {
+        id: product.id,
+        size: product.sizes.size,
+        length: product.sizes.length,
+        color: product.shoeshascolors.colors.name,
+        name: product.shoeshascolors.shoes.name,
+        brand: product.shoeshascolors.shoes.brand.name,
+        category:
+          product.shoeshascolors.shoes.shoeshascategory.length > 0
+            ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
+            : "", // Default value
+        buying_price: currentStockDetail ? currentStockDetail.buying_price : 0,
+        selling_price: currentStockDetail
+          ? currentStockDetail.selling_price
+          : 0,
+        barcode: currentStockDetail ? currentStockDetail.barcode : "",
+        qty: currentStockDetail ? currentStockDetail.qty : 0,
+      };
+    });
 
     res.json({
       message: "success",
-      data: ordererProducts,
+      data: orderedProducts,
     });
   } catch (error: any) {
     res.json({
@@ -366,7 +399,6 @@ product.get("/", async (req, res) => {
 });
 
 //Get Product Card Details
-
 product.get("/card", async (req, res) => {
   try {
     const products = await prisma.product.findMany({
@@ -389,7 +421,9 @@ product.get("/card", async (req, res) => {
           },
         },
         stockdetails: {
-          select: { selling_price: true, qty: true, Product_id: true },
+          orderBy: {
+            id: "asc",
+          },
         },
       },
     });
@@ -402,7 +436,7 @@ product.get("/card", async (req, res) => {
       price: number;
       available: number;
     }
-    
+
     interface Product {
       id: number;
       wished: boolean;
@@ -412,16 +446,15 @@ product.get("/card", async (req, res) => {
       category: string[];
       sizes: SizeDetail[];
     }
-    
-    
+
     interface ProductMap {
       [key: string]: Product;
     }
-    
-    const productMap:ProductMap = {};
+
+    const productMap: ProductMap = {};
     //Build a map of products by brand and name
     products.forEach((product) => {
-      const stockDetail = product.stockdetails[0] || {};
+      //const stockDetail = product.stockdetails[0] || {};
       const key = `${product.shoeshascolors.shoes.brand.name}-${product.shoeshascolors.shoes.name}`;
 
       if (!productMap[key]) {
@@ -434,18 +467,31 @@ product.get("/card", async (req, res) => {
           category: product.shoeshascolors.shoes.shoeshascategory.map(
             (cat) => cat.category.name
           ),
-          sizes: []
+          sizes: [],
         };
+      }
+
+      let availableStock = product.stockdetails.find(stock => stock.qty > 0);
+      if (!availableStock) {
+        availableStock = product.stockdetails[0] || {}; // If no available stock, take the first one (even if qty is 0)
       }
 
       productMap[key].sizes.push({
         size: product.sizes.size,
         length: product.sizes.length,
         color: product.shoeshascolors.colors.name,
-        price: stockDetail.selling_price || 0,
-        available: stockDetail.qty || 0,
+        price: availableStock.selling_price || 0,
+        available: availableStock.qty || 0,
       });
     });
+    //   productMap[key].sizes.push({
+    //     size: product.sizes.size,
+    //     length: product.sizes.length,
+    //     color: product.shoeshascolors.colors.name,
+    //     price: stockDetail.selling_price || 0,
+    //     available: stockDetail.qty || 0,
+    //   });
+    // });
 
     const formattedProducts = Object.values(productMap);
 
@@ -460,7 +506,6 @@ product.get("/card", async (req, res) => {
     });
   }
 });
-
 
 //Get next product id
 product.get("/nextid", async (req, res) => {

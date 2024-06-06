@@ -394,6 +394,7 @@ function addName() {
           <div class="flex justify-center items-center">
             <UFormGroup label="Size:" name="selectedSize">
               <USelectMenu
+              class="w-20"
                 color="primary"
                 :options="Sizes"
                 v-model="form.selectedSize"
@@ -414,6 +415,7 @@ function addName() {
           <div class="flex justify-center items-center">
             <UFormGroup label="Color:" name="selectedColor">
               <USelectMenu
+              class="w-24"
                 color="primary"
                 :options="Colors"
                 v-model="form.selectedColor"
@@ -434,6 +436,7 @@ function addName() {
           <div class="flex justify-center items-center">
             <UFormGroup label="Category" name="selectedCategory">
               <USelectMenu
+              class="w-24"
                 color="primary"
                 :options="Categories"
                 v-model="form.selectedCategory"
@@ -466,6 +469,7 @@ function addName() {
         <div class="w-full flex flex-row items-center gap-2">
           <UFormGroup label="Name:" name="selectedName">
             <USelectMenu
+            class="w-40"
               color="primary"
               :options="Names"
               v-model="form.selectedName"

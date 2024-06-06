@@ -25,6 +25,7 @@ app.use("/user", Route.User);
 app.use("/supplier", Route.Supplier);
 app.use("/product", Route.Product);
 app.use("/invoice", Route.Invoice);
+app.use("/stock", Route.Stock);
 
 
 app.listen(8000, () => {

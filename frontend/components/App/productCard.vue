@@ -56,7 +56,7 @@ function getPrice(size, index) {
       <div class="flex">
         <h2>Size(UK)</h2>
         <div
-          class="flex flex-wrap gap-5 pt-1 p-1 pb-2"
+          class="flex flex-wrap gap-6 pt-1 p-1 pb-2"
           v-for="size in shoe.sizes"
           :key="size.size"
         >
@@ -69,6 +69,9 @@ function getPrice(size, index) {
               >{{ size.size }}</UBadge
             >
           </UChip>
+          <!-- <div>
+            <p>{{ size.color }}</p>
+          </div> -->
         </div>
       </div>
       <div class="flex gap-4 justify-center items-center pt-2">

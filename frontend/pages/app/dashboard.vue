@@ -1,9 +1,8 @@
 <script setup>
-
 const isSidebarOpen = ref(true);
 
 useHead({
-  title:"Dashboard | Shoe Shop"
+  title: "Dashboard | Shoe Shop",
 });
 
 function toggleMenu() {
@@ -17,7 +16,7 @@ function toggleMenu() {
       <div
         class="w-full min-h-screen p-8 bg-bkg-primary rounded-lg shadow dark:shadow-black"
       >
-        <AppAddStock/>
+        <AppAddStock />
       </div>
     </NuxtLayout>
   </div>
