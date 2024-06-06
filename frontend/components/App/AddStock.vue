@@ -3,6 +3,11 @@ import { getProductSchema } from "~/schema";
 import { addItemSchema } from "~/schema";
 import { addStockSchema } from "~/schema";
 
+// Filter
+const filterOption = ["Filter Option", "Brand", "ID", "Name"];
+const selected = ref(filterOption[0]);
+const searchedValue = ref("");
+
 //Table columns for adding stock items
 const columns = [
   {
@@ -221,6 +226,82 @@ watch(categoryData, () => {
     form.value.category = newcategoryID;
   });
 });
+
+////////////////////*******************//////////////////////
+//Table to show  available stock items
+// Table columns
+const Columns = [
+  {
+    key: "product.id",
+    label: "P_ID",
+  },
+  {
+    key: "product.brand",
+    label: "Brand",
+  },
+  {
+    key: "product.name",
+    label: "Name",
+  },
+  {
+    key: "sellingPrice",
+    label: "Current Price",
+  },
+  {
+    key: "buyingPrice",
+    label: "Buying Price",
+  },
+  {
+    key: "qty",
+    label: "Quantity",
+  },
+  {
+    key: "actions",
+  },
+];
+
+const items = (row) => [
+  [
+    {
+      label: "Edit",
+      icon: "solar:gallery-edit-line-duotone",
+      click: () => console.log("Edit", row.id),
+    },
+    {
+      label: "More Info",
+      icon: "solar:info-circle-broken",
+    },
+  ],
+  [
+    {
+      label: "Delete",
+      icon: "solar:clipboard-remove-broken",
+    },
+  ],
+];
+
+const stockDetails = ref([]);
+
+const page = ref(1);
+const pageCount = 5;
+
+const rows = computed(() => {
+  return stockDetails.value.slice(
+    (page.value - 1) * pageCount,
+    page.value * pageCount
+  );
+});
+
+const { data: shoe } = useFetch("http://localhost:8000/stock");
+watch(shoe, () => {
+  if (shoe.value && shoe.value.message === "success") {
+    stockDetails.value = shoe.value.data;
+  } else {
+    console.log("error");
+    console.log(shoe);
+  }
+});
+
 ////////////////////*******************//////////////////////
 //Get product ID based on details
 
@@ -332,7 +413,7 @@ async function addStock() {
     }),
   });
 
-  console.log(stock);
+  // console.log(stock);
   if (stock.value && stock.value.message === "success") {
     alert("Stock added successfully");
     stockItems.value = [];
@@ -343,6 +424,7 @@ async function addStock() {
     btnDisabled.value = false;
   } else {
     alert(stock.value.message);
+    console.log(stock.value);
     script.value = {
       supplierID: 0,
       paidAmount: 0,
@@ -350,11 +432,14 @@ async function addStock() {
     btnDisabled.value = false;
   }
 }
+
+function search() {
+  console.log("Search");
+}
 </script>
 
 <template>
   <div class="w-full">
-    
     <div class="w-full p-2 flex justify-between items-center">
       <UForm :schema="getProductSchema" :state="form" @submit="getValue">
         <h1 class="text-lg font-mono font-bold">Add New Stock</h1>
@@ -492,12 +577,46 @@ async function addStock() {
       </UForm>
     </div>
 
-    <div class="w-full flex pt-10">
-      g
-      h
-      e
-      d
-      
+    <div class="px-3 pt-11">
+      <div class="flex items-center p-3 gap-5">
+        <USelectMenu
+          color="primary"
+          v-model="selected"
+          :options="filterOption"
+        />
+        <UInput
+          color="primary"
+          variant="outline"
+          placeholder="Search..."
+          v-model="searchedValue"
+        />
+        <UButton
+          color="primary"
+          variant="ghost"
+          icon="solar:minimalistic-magnifer-linear"
+          @click="search"
+        />
+      </div>
+      <UTable :rows="rows" :columns="Columns">
+        <template #actions-data="{ row }">
+          <UDropdown :items="items(row)">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
+            />
+          </UDropdown>
+        </template>
+      </UTable>
+      <div
+        class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
+      >
+        <UPagination
+          v-model="page"
+          :page-count="pageCount"
+          :total="stockDetails.length"
+        />
+      </div>
     </div>
   </div>
 </template>

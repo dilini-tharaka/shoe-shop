@@ -6,78 +6,70 @@ const prisma = new PrismaClient();
 
 //Get all stocks details
 stock.get("/", async (req, res) => {
-  const stocks = await prisma.stockdetails.findMany({
-    include: {
-      product: {
-        include: {
-          shoeshascolors: {
-            include: {
-              shoes: {
-                include: {
-                  brand: true,
-                  shoeshascategory: {
-                    include: {
-                      category: true,
+  try {
+    const products = await prisma.stockdetails.findMany({
+      where: {
+        qty: {
+          gt: 0, //get only products with quantity greater than 0
+        },
+      },
+      orderBy: {
+        id: "asc",
+      },
+      include: {
+        product: {
+          include: {
+            sizes: { select: { size: true, length: true } },
+            shoeshascolors: {
+              include: {
+                colors: { select: { name: true } },
+                shoes: {
+                  include: {
+                    brand: { select: { name: true } },
+                    shoeshascategory: {
+                      include: {
+                        category: { select: { name: true } },
+                      },
                     },
                   },
                 },
               },
-              colors: true,
             },
           },
-          sizes: true,
         },
       },
-    },
-  });
+    });
 
-  //   const stockDetails = stocks.map((stock) => {
-  //     return {
-  //       id: stock.id,
-  //       productId: stock.Product_id,
-  //       price: stock.selling_price,
-  //       product: {
-  //         id: stock.product.id,
-  //         name: stock.product.shoeshascolors.shoes.name,
-  //         shoeshascolors: stock.product.shoeshascolors.map((shoeHasColor:any) => {
-  //           return {
-  //             id: shoeHasColor.id,
-  //             shoeId: shoeHasColor.shoeId,
-  //             shoe: {
-  //               id: shoeHasColor.shoes.id,
-  //               name: shoeHasColor.shoes.name,
-  //               brand: shoeHasColor.shoes.brand,
-  //               category: shoeHasColor.shoes.shoeshascategory.map(
-  //                 (shoeHasCategory:any) => {
-  //                   return {
-  //                     id: shoeHasCategory.category.id,
-  //                     name: shoeHasCategory.category.name,
-  //                   };
-  //                 }
-  //               ),
-  //               colors: shoeHasColor.colors.map((color:any) => {
-  //                 return {
-  //                   id: color.id,
-  //                   name: color.name,
-  //                 };
-  //               }),
-  //             },
-  //           };
-  //         }),
-  //         sizes: stock.product.sizes.map((size:any) => {
-  //           return {
-  //             id: size.id,
-  //             size: size.size,
-  //           };
-  //         }),
-  //       },
-  //       stock: stock.stock,
-  //     };
-  //   });
-  res.json({
-    message: "success",
-    data: stocks,
-  });
+    //format the data
+    const result = products.map((product) => ({
+      id: product.id,
+      qty: product.qty,
+      buyingPrice: product.buying_price,
+      sellingPrice: product.selling_price,
+      barcode: product.barcode,
+      product: {
+        id: product.product.id,
+        name: product.product.shoeshascolors.shoes.name,
+        brand: product.product.shoeshascolors.shoes.brand.name,
+        category:
+          product.product.shoeshascolors.shoes.shoeshascategory[0].category
+            .name,
+        color: product.product.shoeshascolors.colors.name,
+        size: product.product.sizes.size,
+        length: product.product.sizes.length,
+      },
+    }));
+
+    res.json({
+      message: "success",
+      data: result,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
 });
 
 //Get product id using brand, category, shoe name, color, size
