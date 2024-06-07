@@ -9,7 +9,7 @@
     </template>
 
     <template #content>
-      <AppProductCard />
+      <h1>Helllo Kids!</h1>
     </template>
   </NuxtLayout>
 </template>

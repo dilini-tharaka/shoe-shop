@@ -20,33 +20,33 @@ function toggleTheme() {
       </div>
       <div class="flex lg:w-full gap-5 lg:gap-12 pl-4 lg:pl-20">
         <ULink
-          to="/Dashboard"
+          to="/app/ecommerce"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
-          Kids
+        Men
         </ULink>
 
         <ULink
-          to="/auth/login"
-          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
-          active-class="text-primary"
-          inactive-class="text-secondary"
-        >
-          Men
-        </ULink>
-
-        <ULink
-          to="/auth/login"
+          to="/app/ecommerce/women"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
         >
           Women
         </ULink>
+
         <ULink
-          to="/auth/login"
+          to="/app/ecommerce/kids"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Kids
+        </ULink>
+        <ULink
+          to="/app/ecommerce/sports"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"

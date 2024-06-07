@@ -4,12 +4,12 @@ const isSidebarOpen = ref(true);
 function toggleMenu() {
   isSidebarOpen.value = !isSidebarOpen.value;
 
-  console.log(isSidebarOpen.value);
+  //console.log(isSidebarOpen.value);
 }
 </script>
 
 <template>
-  <div class="w-full h-screen bg-bkg-secondary flex flex-col ">
+  <div class="w-full h-screen bg-bkg-secondary flex flex-col">
     <!-- Header Start -->
     <header class="w-full p-5">
       <div
@@ -29,16 +29,10 @@ function toggleMenu() {
             size="sm"
             color="black"
             variant="ghost"
-            @click="notification"
           />
-
-          <UButton
-            :icon="themeIcon"
-            size="sm"
-            color="black"
-            variant="ghost"
-            @click="toggleTheme"
-          />
+          <!-- @click="notification" -->
+          <UButton :icon="themeIcon" size="sm" color="black" variant="ghost" />
+          <!-- @click="toggleTheme" -->
           <UAvatar
             chip-color="primary"
             chip-text=""
@@ -71,10 +65,12 @@ function toggleMenu() {
       </div>
       <!-- Side menu End -->
 
-      <div class="flex-1 px-5 pb-5 flex flex-col justify-between overflow-y-scroll">
+      <div
+        class="flex-1 px-5 pb-5 flex flex-col justify-between overflow-y-scroll"
+      >
         <!-- Content Start -->
         <main class="w-full flex flex-col gap-3 pb-5">
-            <slot />
+          <slot />
         </main>
         <!-- Content End -->
 

@@ -6,12 +6,12 @@
   </header>
 
   <main class="w-full bg-bkg-secondary flex flex-1 flex-col">
-    <div class="w-full h-[500px] bg-bkg-primary overflow-hidden">
-      <slot name="hero"/>
+    <div class="w-full flex h-[500px]">
+      <slot name="hero"></slot>
     </div>
     <div class="p-3">
-      <div class="w-full flex min-h-screen bg-bkg-primary">
-        <slot name="content" />
+      <div class="w-full flex flex-wrap min-h-screen bg-bkg-primary p-4 gap-3">
+        <slot name="content"></slot>
       </div>
     </div>
   </main>

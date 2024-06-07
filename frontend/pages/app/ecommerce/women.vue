@@ -9,7 +9,11 @@
     </template>
 
     <template #content>
-      <AppProductCard />
-    </template>
+        <!-- <div v-if="category === 'women'">
+            <h1>
+                Hello Lady!
+            </h1>
+        </div> -->
+        </template>
   </NuxtLayout>
 </template>
