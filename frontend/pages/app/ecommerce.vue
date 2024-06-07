@@ -4,7 +4,7 @@
   <NuxtLayout name="e-commerce">
     <template #hero>
       <div
-        class="w-full h-full bg-[url(/img/login.png)] bg-center bg-cover"
+        class="w-full h-full bg-[url(/img/home.jpg)] bg-center bg-cover"
       ></div>
     </template>
 

@@ -40,4 +40,30 @@ login.post("/", async (req, res) => {
   }
 });
 
+//login for Employee
+login.post("/employee", async (req, res) => {
+  try {
+    const user = await prisma.user.findMany({
+      where: {
+        userName: req.body.username,
+        password: req.body.password,
+      },
+    });
+
+    if (user.length === 0) {
+      return res.json({
+        message: "Error! invalid username or password",
+      });
+    }
+    res.json({
+      message: "success",
+      data: user,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
 export const Login = login;

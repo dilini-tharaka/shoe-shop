@@ -25,11 +25,20 @@ function toggleTheme() {
           active-class="text-primary"
           inactive-class="text-secondary"
         >
-        Men
+          Home
         </ULink>
 
         <ULink
-          to="/app/ecommerce/women"
+          to="/app/category/men"
+          class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
+          active-class="text-primary"
+          inactive-class="text-secondary"
+        >
+          Men
+        </ULink>
+
+        <ULink
+          to="/app/category/women"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
@@ -38,7 +47,7 @@ function toggleTheme() {
         </ULink>
 
         <ULink
-          to="/app/ecommerce/kids"
+          to="/app/category/kids"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"
@@ -46,7 +55,7 @@ function toggleTheme() {
           Kids
         </ULink>
         <ULink
-          to="/app/ecommerce/sports"
+          to="/app/category/sports"
           class="transition-colors duration-300 hover:text-primary text-md lg:text-lg font-mono"
           active-class="text-primary"
           inactive-class="text-secondary"

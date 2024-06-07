@@ -402,6 +402,10 @@ function deleteItem(row) {
 //Add stock to the database
 
 async function addStock() {
+  if (!stockItems.value.length) {
+    alert("Please add items to the table first");
+    return;
+  }
   btnDisabled.value = true;
   const { data: stock } = await useFetch("http://localhost:8000/stock", {
     method: "POST",

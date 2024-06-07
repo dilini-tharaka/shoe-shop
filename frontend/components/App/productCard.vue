@@ -7,7 +7,7 @@ const { data: cardDetails } = useFetch("http://localhost:8000/product/card");
 watch(cardDetails, () => {
   if (cardDetails.value.message === "success") {
     shoes.value = cardDetails.value.data;
-    console.log(shoes.value);
+    //console.log(shoes.value);
   } else {
     console.log("error");
     console.log(cardDetails);
@@ -51,7 +51,7 @@ function getPrice(size, index) {
       <h2 class="text-lg font-mono font-bold">{{ shoe.name }}</h2>
       <div class="flex justify-between">
         <h2>{{ shoe.brand }}</h2>
-        <h1 class="text-lg font-bold">SLRs.{{ shoe.price }}</h1>
+        <h1 class="text-lg font-bold">LKR.{{ shoe.price }}</h1>
       </div>
       <div class="flex">
         <h2>Size(UK)</h2>
