@@ -1,24 +1,21 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import * as Route from "./src/router/index";
+import path from "path";
 import cors from "cors";
 
 const app = express();
 const prisma = new PrismaClient();
-app.use(cors({
-  origin: "http://localhost:3000",
-}));
-
-app.get("/", async (req, res) => {
-  const users = await prisma.customer.findMany();
-  res.json({
-    message: "success",
-    data: users,
-  });
-});
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 //middlewares
 app.use(express.json());
+//app.use(express.urlencoded({ extended: true })); // To parse URL-encoded data
+
 app.use("/login", Route.Login);
 app.use("/register", Route.Register);
 app.use("/user", Route.User);
@@ -27,8 +24,9 @@ app.use("/product", Route.Product);
 app.use("/invoice", Route.Invoice);
 app.use("/stock", Route.Stock);
 
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
 });
-

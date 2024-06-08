@@ -151,6 +151,11 @@ stock.post("/product", async (req, res) => {
               id: req.body.size,
             },
           },
+          images: {
+            create: {
+              path: req.body.image || "default.jpg",
+            },
+          },
         },
       });
 

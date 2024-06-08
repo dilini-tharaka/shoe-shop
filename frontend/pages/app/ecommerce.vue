@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+useHead({
+  title: "E-commerce",
+});
+</script>
 
 <template>
   <NuxtLayout name="e-commerce">

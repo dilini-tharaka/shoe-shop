@@ -1,8 +1,22 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import multer from "multer";
+import path from "path";
 
 const product = express.Router();
 const prisma = new PrismaClient();
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
 
 //Get all Brands
 product.get("/brand", async (req, res) => {
@@ -471,7 +485,7 @@ product.get("/card", async (req, res) => {
         };
       }
 
-      let availableStock = product.stockdetails.find(stock => stock.qty > 0);
+      let availableStock = product.stockdetails.find((stock) => stock.qty > 0);
       if (!availableStock) {
         availableStock = product.stockdetails[0] || {}; // If no available stock, take the first one (even if qty is 0)
       }
@@ -570,15 +584,25 @@ product.get("/:id", async (req, res) => {
 });
 
 //Create a new product
-product.post("/", async (req, res) => {
+product.post("/", upload.single("image"), async (req, res) => {
+  const { size, selectedSize, color, selectedColor, brand, name, selectedName, category, selectedCategory } = req.body;
   try {
+    console.log(req.file);
+    if (!req.file) {
+      res.json({
+        message: "error",
+        data: "No file uploaded",
+      });
+      return;
+    }
+
     const existingShoe = await prisma.shoes.findFirst({
       where: {
-        name: req.body.selectedName,
-        brand_id: req.body.brand,
+        name: selectedName,
+        brand_id: parseInt(brand),
         shoeshascategory: {
           some: {
-            Category_id: req.body.category,
+            Category_id: parseInt(category),
           },
         },
       },
@@ -596,14 +620,19 @@ product.post("/", async (req, res) => {
               },
               colors: {
                 connect: {
-                  id: req.body.color,
+                  id: parseInt(color),
                 },
               },
             },
           },
           sizes: {
             connect: {
-              id: req.body.size,
+              id: parseInt(size),
+            },
+          },
+          images: {
+            create: {
+              path: req.file.filename,
             },
           },
         },
@@ -622,16 +651,16 @@ product.post("/", async (req, res) => {
                 create: {
                   brand: {
                     connect: {
-                      id: req.body.brand,
+                      id: parseInt(brand),
                     },
                   },
-                  name: req.body.selectedName,
+                  name: selectedName,
                   shoeshascategory: {
                     create: {
                       category: {
                         connectOrCreate: {
-                          where: { id: req.body.category },
-                          create: { name: req.body.selectedCategory },
+                          where: { id: parseInt(category) },
+                          create: { name: selectedCategory },
                         },
                       },
                     },
@@ -640,14 +669,19 @@ product.post("/", async (req, res) => {
               },
               colors: {
                 connect: {
-                  id: req.body.color,
+                  id: parseInt(color),
                 },
               },
             },
           },
           sizes: {
             connect: {
-              id: req.body.size,
+              id: parseInt(size),
+            },
+          },
+          images: {
+            create: {
+              path: req.file.filename,
             },
           },
         },

@@ -1,5 +1,5 @@
 <script setup>
-const path = "/img/shoes/";
+const path = "http://localhost:8000/uploads/";
 
 const shoes = ref([]);
 const { data: cardDetails } = useFetch("http://localhost:8000/product/card");
@@ -46,6 +46,7 @@ function getPrice(size, index) {
         variant="ghost"
         @click="toggleWish(index)"
       />
+     
     </div>
     <div class="flex flex-col gap-2 p-2">
       <h2 class="text-lg font-mono font-bold">{{ shoe.name }}</h2>

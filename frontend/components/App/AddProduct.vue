@@ -1,5 +1,6 @@
 <script setup>
 import { addProductSchema } from "~/schema";
+import { imageSchema } from "~/schema";
 
 let btnDisabled = ref(false);
 // Filter
@@ -109,6 +110,7 @@ const form = ref({
   selectedName: "",
   category: 0,
   selectedCategory: "",
+  image: null,
 });
 
 // Slideover
@@ -277,47 +279,90 @@ function search() {
   console.log("Search");
 }
 
-async function addProduct() {
-  btnDisabled.value = true;
-  const { data } = await useFetch("http://localhost:8000/product", {
-    method: "POST",
-    body: JSON.stringify(form.value),
-  });
+//////////////////////********************/////////////////////////
 
-  if (data.value && data.value.message === "success") {
-    form.value = {
-      size: 0,
-      selectedSize: "",
-      color: 0,
-      selectedColor: "",
-      brand: 0,
-      name: 0,
-      selectedName: "",
-      category: 0,
-      selectedCategory: "",
-    };
+function handleFileInput(event) {
+  const file = event.target.files[0];
+  form.value.image = {
+    file: file,
+    name: file.name,
+  };
+}
+//////////////////////********************/////////////////////////
+async function addProduct() {
+  if (!form.value.image) {
+    return alert("Please select an image.");
+  }
+  btnDisabled.value = true;
+
+  const formData = new FormData();
+
+  formData.append("image", form.value.image.file);
+  formData.append("size", form.value.size);
+  formData.append("selectedSize", form.value.selectedSize);
+  formData.append("color", form.value.color);
+  formData.append("selectedColor", form.value.selectedColor);
+  formData.append("brand", form.value.brand);
+  formData.append("name", form.value.name);
+  formData.append("selectedName", form.value.selectedName);
+  formData.append("category", form.value.category);
+  formData.append("selectedCategory", form.value.selectedCategory);
+
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+  try {
+    const data = await useFetch("http://localhost:8000/product", {
+      method: "POST",
+      body: formData,
+      // headers: {
+      //   "Content-Type": "multipart/form-data",
+      // },
+    });
+
+    console.log(toRaw(data.value));
+
+    if (data.value && data.value.message === "success") {
+      form.value = {
+        size: 0,
+        selectedSize: "",
+        color: 0,
+        selectedColor: "",
+        brand: 0,
+        name: 0,
+        selectedName: "",
+        category: 0,
+        selectedCategory: "",
+      };
+      btnDisabled.value = false;
+      return alert("Product Added Successfully!");
+    } else {
+      console.log("error");
+      console.log(data);
+      console.log(data.value);
+      btnDisabled.value = false;
+      return alert("Product Not Added!");
+    }
+  } catch (error) {
+    console.error("Error:", error.error.message);
     btnDisabled.value = false;
-    return alert("Product Added Successfully!");
-  } else {
-    console.log("error");
-    console.log(data);
-    btnDisabled.value = false;
-    return alert("Product Not Added!");
+    return alert("Product Not Added! catch error");
   }
 }
 
 function cancel() {
-  form.value = {
-    size: 0,
-    selectedSize: "",
-    color: 0,
-    selectedColor: "",
-    brand: 0,
-    name: 0,
-    selectedName: "",
-    category: 0,
-    selectedCategory: "",
-  };
+  // form.value = {
+  //   size: 0,
+  //   selectedSize: "",
+  //   color: 0,
+  //   selectedColor: "",
+  //   brand: 0,
+  //   name: 0,
+  //   selectedName: "",
+  //   category: 0,
+  //   selectedCategory: "",
+  // };
+  console.log(form.value);
 }
 
 function addSize() {
@@ -381,23 +426,104 @@ function addName() {
     </div>
 
     <div class="w-full flex flex-col px-3 pb-3">
-      <UForm :schema="addProductSchema" :state="form" @submit="addProduct">
-        <div>
-          <h1 class="text-lg font-mono font-bold">Add Product</h1>
-        </div>
+      <UForm
+        :schema="addProductSchema"
+        :state="form"
+        @submit="addProduct"
+        class="flex"
+      >
+        <div class="w-3/5">
+          <div>
+            <h1 class="text-lg font-mono font-bold">Add Product</h1>
+          </div>
 
-        <div class="flex flex-row gap-16 items-center">
-          <UFormGroup label="ID:">
-            <UBadge color="primary" variant="soft">{{ id }}</UBadge>
-          </UFormGroup>
+          <div class="flex flex-row gap-16 items-center">
+            <UFormGroup label="ID:">
+              <UBadge color="primary" variant="soft">{{ id }}</UBadge>
+            </UFormGroup>
 
-          <div class="flex justify-center items-center">
-            <UFormGroup label="Size:" name="selectedSize">
-              <USelectMenu
-              class="w-20"
+            <div class="flex justify-center items-center">
+              <UFormGroup label="Size:" name="selectedSize">
+                <USelectMenu
+                  class="w-20"
+                  color="primary"
+                  :options="Sizes"
+                  v-model="form.selectedSize"
+                />
+              </UFormGroup>
+
+              <UButton
+                icon="solar:add-circle-broken"
+                size="sm"
                 color="primary"
-                :options="Sizes"
-                v-model="form.selectedSize"
+                variant="ghost"
+                @click="addSize"
+              />
+              <USlideover v-model="isSize">
+                <AppAddSize />
+              </USlideover>
+            </div>
+            <div class="flex justify-center items-center">
+              <UFormGroup label="Color:" name="selectedColor">
+                <USelectMenu
+                  class="w-24"
+                  color="primary"
+                  :options="Colors"
+                  v-model="form.selectedColor"
+                />
+              </UFormGroup>
+              <UButton
+                icon="solar:add-circle-broken"
+                size="sm"
+                color="primary"
+                variant="ghost"
+                @click="addColor"
+              />
+
+              <USlideover v-model="isColor">
+                <AppAddColor />
+              </USlideover>
+            </div>
+            <div class="flex justify-center items-center">
+              <UFormGroup label="Category" name="selectedCategory">
+                <USelectMenu
+                  class="w-24"
+                  color="primary"
+                  :options="Categories"
+                  v-model="form.selectedCategory"
+                />
+              </UFormGroup>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 py-3">
+            <UFormGroup label="Brands:" name="brand">
+              <div class="flex gap-4 items-center">
+                <URadio
+                  v-for="brand of Brands"
+                  :key="Brands.value"
+                  v-model="form.brand"
+                  v-bind="brand"
+                />
+              </div>
+            </UFormGroup>
+            <UButton
+              icon="solar:add-circle-broken"
+              size="sm"
+              color="primary"
+              variant="ghost"
+              @click="addBrand"
+            />
+            <USlideover v-model="isBrand">
+              <AppAddBrand />
+            </USlideover>
+          </div>
+          <div class="w-full flex flex-row items-center gap-2">
+            <UFormGroup label="Name:" name="selectedName">
+              <USelectMenu
+                class="w-40"
+                color="primary"
+                :options="Names"
+                v-model="form.selectedName"
               />
             </UFormGroup>
 
@@ -406,92 +532,48 @@ function addName() {
               size="sm"
               color="primary"
               variant="ghost"
-              @click="addSize"
+              @click="addName"
             />
-            <USlideover v-model="isSize">
-              <AppAddSize />
+            <USlideover v-model="isName">
+              <AppAddName />
             </USlideover>
-          </div>
-          <div class="flex justify-center items-center">
-            <UFormGroup label="Color:" name="selectedColor">
-              <USelectMenu
-              class="w-24"
-                color="primary"
-                :options="Colors"
-                v-model="form.selectedColor"
-              />
-            </UFormGroup>
-            <UButton
-              icon="solar:add-circle-broken"
-              size="sm"
-              color="primary"
-              variant="ghost"
-              @click="addColor"
-            />
-
-            <USlideover v-model="isColor">
-              <AppAddColor />
-            </USlideover>
-          </div>
-          <div class="flex justify-center items-center">
-            <UFormGroup label="Category" name="selectedCategory">
-              <USelectMenu
-              class="w-24"
-                color="primary"
-                :options="Categories"
-                v-model="form.selectedCategory"
-              />
-            </UFormGroup>
+            <div class="flex justify-center gap-6 px-2">
+              <UButton type="submit" class="my-5" :disabled="btnDisabled"
+                >Add a Product</UButton
+              >
+              <UButton class="my-5" color="gray" variant="solid" @click="cancel"
+                >Cancel</UButton
+              >
+            </div>
           </div>
         </div>
-        <div class="flex flex-wrap items-center gap-4 py-3">
-          <UFormGroup label="Brands:" name="brand">
-            <div class="flex gap-4 items-center">
-              <URadio
-                v-for="brand of Brands"
-                :key="Brands.value"
-                v-model="form.brand"
-                v-bind="brand"
+        <div class="w-2/5">
+          <UFormGroup label="Shoe Image:" name="image.name">
+            <div class="border border-dashed border-gray-500 relative">
+              <input
+                @change="handleFileInput"
+                type="file"
+                class="cursor-pointer relative block opacity-0 w-full h-full p-20 z-50"
               />
+              <div
+                class="text-center p-10 absolute top-0 right-0 left-0 m-auto"
+              >
+                <h4 class="text-gray-400">
+                  Drop Image anywhere to upload
+                  <br />or
+                </h4>
+                <p class="text-gray-400">Select Files</p>
+                <p class="text-gray-400">
+                  PNG, JPG SVG, WEBP, and GIF are Allowed.
+                </p>
+              </div>
             </div>
           </UFormGroup>
-          <UButton
-            icon="solar:add-circle-broken"
-            size="sm"
-            color="primary"
-            variant="ghost"
-            @click="addBrand"
-          />
-          <USlideover v-model="isBrand">
-            <AppAddBrand />
-          </USlideover>
-        </div>
-        <div class="w-full flex flex-row items-center gap-2">
-          <UFormGroup label="Name:" name="selectedName">
-            <USelectMenu
-            class="w-40"
-              color="primary"
-              :options="Names"
-              v-model="form.selectedName"
-            />
-          </UFormGroup>
-
-          <UButton
-            icon="solar:add-circle-broken"
-            size="sm"
-            color="primary"
-            variant="ghost"
-            @click="addName"
-          />
-          <USlideover v-model="isName">
-            <AppAddName />
-          </USlideover>
-          <div class="flex justify-center gap-6 px-2">
-            <UButton type="submit" class="my-5" :disabled="btnDisabled">Add a Product</UButton>
-            <UButton class="my-5" color="gray" variant="solid" @click="cancel"
-              >Cancel</UButton
-            >
-          </div>
+          <!-- <div v-if="errors.length > 0" class="text-red-600 text-sm mt-2">
+            <ul>
+              <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+            </ul>
+          </div> -->
         </div>
       </UForm>
     </div>
