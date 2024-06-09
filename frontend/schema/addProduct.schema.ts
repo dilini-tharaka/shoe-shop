@@ -13,7 +13,7 @@ export const addProductSchema = z.object({
 });
 
 export const imageSchema = z.object({
-  name: z.string().nonempty("Must select a file"),
+  //name: z.string().nonempty("Must select a file"),
   _type: z.enum([
     "image/png",
     "image/jpeg",

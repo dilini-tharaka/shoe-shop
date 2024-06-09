@@ -116,98 +116,103 @@ stock.post("/product", async (req, res) => {
       return;
     }
 
-    ///If product does not exist, create a new product
-    const existingShoe = await prisma.shoes.findFirst({
-      where: {
-        name: req.body.selectedName,
-        brand_id: req.body.brand,
-        shoeshascategory: {
-          some: {
-            Category_id: req.body.category,
-          },
-        },
-      },
+    res.json({
+      message: "Product does not exist! Add product first!",
+      data: null,
     });
+ 
+    ///If product does not exist, create a new product
+    // const existingShoe = await prisma.shoes.findFirst({
+    //   where: {
+    //     name: req.body.selectedName,
+    //     brand_id: req.body.brand,
+    //     shoeshascategory: {
+    //       some: {
+    //         Category_id: req.body.category,
+    //       },
+    //     },
+    //   },
+    // });
 
-    if (existingShoe) {
-      const product = await prisma.product.create({
-        data: {
-          shoeshascolors: {
-            create: {
-              shoes: {
-                connect: {
-                  id: existingShoe.id,
-                },
-              },
-              colors: {
-                connect: {
-                  id: req.body.color,
-                },
-              },
-            },
-          },
-          sizes: {
-            connect: {
-              id: req.body.size,
-            },
-          },
-          images: {
-            create: {
-              path: req.body.image || "default.jpg",
-            },
-          },
-        },
-      });
+    // if (existingShoe) {
+    //   const product = await prisma.product.create({
+    //     data: {
+    //       shoeshascolors: {
+    //         create: {
+    //           shoes: {
+    //             connect: {
+    //               id: existingShoe.id,
+    //             },
+    //           },
+    //           colors: {
+    //             connect: {
+    //               id: req.body.color,
+    //             },
+    //           },
+    //         },
+    //       },
+    //       sizes: {
+    //         connect: {
+    //           id: req.body.size,
+    //         },
+    //       },
+    //       images: {
+    //         create: {
+    //           path: req.body.image || "default.jpg",
+    //         },
+    //       },
+    //     },
+    //   });
 
-      res.json({
-        message: "success",
-        data: product,
-      });
-    } else {
-      const product = await prisma.product.create({
-        data: {
-          shoeshascolors: {
-            create: {
-              shoes: {
-                create: {
-                  brand: {
-                    connect: {
-                      id: req.body.brand,
-                    },
-                  },
-                  name: req.body.selectedName,
-                  shoeshascategory: {
-                    create: {
-                      category: {
-                        connectOrCreate: {
-                          where: { id: req.body.category },
-                          create: { name: req.body.selectedCategory },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              colors: {
-                connect: {
-                  id: req.body.color,
-                },
-              },
-            },
-          },
-          sizes: {
-            connect: {
-              id: req.body.size,
-            },
-          },
-        },
-      });
+    //   res.json({
+    //     message: "success",
+    //     data: product,
+    //   });
+    // } else {
+    //   const product = await prisma.product.create({
+    //     data: {
+    //       shoeshascolors: {
+    //         create: {
+    //           shoes: {
+    //             create: {
+    //               brand: {
+    //                 connect: {
+    //                   id: req.body.brand,
+    //                 },
+    //               },
+    //               name: req.body.selectedName,
+    //               shoeshascategory: {
+    //                 create: {
+    //                   category: {
+    //                     connectOrCreate: {
+    //                       where: { id: req.body.category },
+    //                       create: { name: req.body.selectedCategory },
+    //                     },
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //           },
+    //           colors: {
+    //             connect: {
+    //               id: req.body.color,
+    //             },
+    //           },
+    //         },
+    //       },
+    //       sizes: {
+    //         connect: {
+    //           id: req.body.size,
+    //         },
+    //       },
+    //     },
+    //   });
 
-      res.json({
-        message: "success",
-        data: product,
-      });
-    }
+    //   res.json({
+    //     message: "success",
+    //     data: product,
+    //   });
+    //}
   } catch (error: any) {
     res.json({
       message: "error",

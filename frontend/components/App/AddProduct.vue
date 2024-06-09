@@ -282,7 +282,30 @@ function search() {
 //////////////////////********************/////////////////////////
 
 function handleFileInput(event) {
-  const file = event.target.files[0];
+  const fileInput = event.target;
+  const file = fileInput.files[0];
+  
+  const allowedTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/svg+xml",
+    "image/webp",
+    "image/gif",
+  ];
+  const maxSize = 50 * 1024 * 1024; // 50 MB
+
+  if (!allowedTypes.includes(file.type)) {
+    alert("Invalid file type. Please select an image file.");
+    fileInput.value = null;
+    return;
+  }
+
+  if (file.size > maxSize) {
+    alert("File size exceeds 50MB. Please select a smaller file.");
+    fileInput.value = null;
+    return;
+  }
+
   form.value.image = {
     file: file,
     name: file.name,
@@ -320,9 +343,9 @@ async function addProduct() {
       // },
     });
 
-    console.log(toRaw(data.value));
+    console.log(data.data.value);
 
-    if (data.value && data.value.message === "success") {
+    if (data.data.value && data.data.value.message === "success") {
       form.value = {
         size: 0,
         selectedSize: "",
@@ -333,6 +356,7 @@ async function addProduct() {
         selectedName: "",
         category: 0,
         selectedCategory: "",
+        image: null,
       };
       btnDisabled.value = false;
       return alert("Product Added Successfully!");
