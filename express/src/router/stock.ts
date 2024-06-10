@@ -72,6 +72,225 @@ stock.get("/", async (req, res) => {
   }
 });
 
+//Get stock details by brand
+stock.get("/brand/:brand", async (req, res) => {
+  const brand = req.params.brand;
+  try {
+    const products = await prisma.stockdetails.findMany({
+      where: {
+        qty: {
+          gt: 0, //get only products with quantity greater than 0
+        },
+        product: {
+          shoeshascolors: {
+            shoes: {
+              brand: {
+                name: {
+                  contains: brand,
+                },
+              },
+            },
+          },
+        },
+      },
+      include: {
+        product: {
+          include: {
+            sizes: { select: { size: true, length: true } },
+            shoeshascolors: {
+              include: {
+                colors: { select: { name: true } },
+                shoes: {
+                  include: {
+                    brand: { select: { name: true } },
+                    shoeshascategory: {
+                      include: {
+                        category: { select: { name: true } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    //format the data
+
+    const result = products.map((product) => ({
+      id: product.id,
+      qty: product.qty,
+      buyingPrice: product.buying_price,
+      sellingPrice: product.selling_price,
+      barcode: product.barcode,
+      product: {
+        id: product.product.id,
+        name: product.product.shoeshascolors.shoes.name,
+        brand: product.product.shoeshascolors.shoes.brand.name,
+        category:
+          product.product.shoeshascolors.shoes.shoeshascategory[0].category
+            .name,
+        color: product.product.shoeshascolors.colors.name,
+        size: product.product.sizes.size,
+        length: product.product.sizes.length,
+      },
+    }));
+
+    res.json({
+      message: "success",
+      data: result,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//Get stock details by name
+stock.get("/name/:name", async (req, res) => {
+  const name = req.params.name;
+  try {
+    const products = await prisma.stockdetails.findMany({
+      where: {
+        qty: {
+          gt: 0, //get only products with quantity greater than 0
+        },
+        product: {
+          shoeshascolors: {
+            shoes: {
+              name: {
+                contains: name,
+              },
+            },
+          },
+        },
+      },
+      include: {
+        product: {
+          include: {
+            sizes: { select: { size: true, length: true } },
+            shoeshascolors: {
+              include: {
+                colors: { select: { name: true } },
+                shoes: {
+                  include: {
+                    brand: { select: { name: true } },
+                    shoeshascategory: {
+                      include: {
+                        category: { select: { name: true } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    //format the data
+    const result = products.map((product) => ({
+      id: product.id,
+      qty: product.qty,
+      buyingPrice: product.buying_price,
+      sellingPrice: product.selling_price,
+      barcode: product.barcode,
+      product: {
+        id: product.product.id,
+        name: product.product.shoeshascolors.shoes.name,
+        brand: product.product.shoeshascolors.shoes.brand.name,
+        category:
+          product.product.shoeshascolors.shoes.shoeshascategory[0].category
+            .name,
+        color: product.product.shoeshascolors.colors.name,
+        size: product.product.sizes.size,
+        length: product.product.sizes.length,
+      },
+    }));
+
+    res.json({
+      message: "success",
+      data: result,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
+
+//Get stock details by product id
+stock.get("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const product = await prisma.stockdetails.findMany({
+      where: {
+        qty: {
+          gt: 0, //get only products with quantity greater than 0
+        },
+        Product_id: id,
+      },
+      include: {
+        product: {
+          include: {
+            sizes: { select: { size: true, length: true } },
+            shoeshascolors: {
+              include: {
+                colors: { select: { name: true } },
+                shoes: {
+                  include: {
+                    brand: { select: { name: true } },
+                    shoeshascategory: {
+                      include: {
+                        category: { select: { name: true } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    //format the data
+    const result = product.map((product) => ({
+      id: product.id,
+      qty: product.qty,
+      buyingPrice: product.buying_price,
+      sellingPrice: product.selling_price,
+      barcode: product.barcode,
+      product: {
+        id: product.product.id,
+        name: product.product.shoeshascolors.shoes.name,
+        brand: product.product.shoeshascolors.shoes.brand.name,
+        category:
+          product.product.shoeshascolors.shoes.shoeshascategory[0].category
+            .name,
+        color: product.product.shoeshascolors.colors.name,
+        size: product.product.sizes.size,
+        length: product.product.sizes.length,
+      },
+    }));
+
+    res.json({
+      message: "success",
+      data: result,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "error",
+      data: error.message,
+    });
+  }
+});
 //Get product id using brand, category, shoe name, color, size
 stock.post("/product", async (req, res) => {
   try {
@@ -120,7 +339,7 @@ stock.post("/product", async (req, res) => {
       message: "Product does not exist! Add product first!",
       data: null,
     });
- 
+
     ///If product does not exist, create a new product
     // const existingShoe = await prisma.shoes.findFirst({
     //   where: {

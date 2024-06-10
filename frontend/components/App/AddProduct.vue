@@ -9,6 +9,88 @@ const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 const shoe = ref([]);
 
+//Search product by id, brand, color, size, name
+async function search() {
+  if (selected.value === "ID") {
+    const { data: product } = await useFetch(
+      `http://localhost:8000/product/${searchedValue.value}`
+    );
+    //console.log(product.value);
+
+    if (product.value.data) {
+      shoe.value = Array.isArray(product.value.data)
+        ? product.value.data
+        : [product.value.data];
+      //console.log(shoe.value);
+    } else {
+      console.log("error");
+      alert("Product Not Found");
+    }
+  } else if (selected.value === "Brand") {
+    const { data: product } = await useFetch(
+      `http://localhost:8000/product/brand/${searchedValue.value}`
+    );
+    //console.log(product.value);
+
+    if (product.value.data) {
+      shoe.value = Array.isArray(product.value.data)
+        ? product.value.data
+        : [product.value.data];
+      //console.log(shoe.value);
+    } else {
+      console.log("error");
+      console.log(product);
+      alert("Product Not Found");
+    }
+  } else if (selected.value === "Color") {
+    const { data: product } = await useFetch(
+      `http://localhost:8000/product/color/${searchedValue.value}`
+    );
+    //console.log(product.value);
+
+    if (product.value.data) {
+      shoe.value = Array.isArray(product.value.data)
+        ? product.value.data
+        : [product.value.data];
+      //console.log(shoe.value);
+    } else {
+      console.log("error");
+      console.log(product);
+      alert("Product Not Found");
+    }
+  } else if (selected.value === "Size") {
+    const { data: product } = await useFetch(
+      `http://localhost:8000/product/size/${searchedValue.value}`
+    );
+    //console.log(product.value);
+
+    if (product.value.data) {
+      shoe.value = Array.isArray(product.value.data)
+        ? product.value.data
+        : [product.value.data];
+      //console.log(shoe.value);
+    } else {
+      console.log("error");
+      console.log(product);
+      alert("Product Not Found");
+    }
+  } else if (selected.value === "Name") {
+    const { data: product } = await useFetch(
+      `http://localhost:8000/product/shoe/${searchedValue.value}`
+    );
+    //console.log(product.value);
+
+    if (product.value.data) {
+      shoe.value = Array.isArray(product.value.data)
+        ? product.value.data
+        : [product.value.data];
+    }
+  } else {
+    console.log("error");
+    alert("Product Not Found");
+  }
+}
+//////////////////////********************/////////////////////////
 // Fetching Data to display in table
 const { data: products } = useFetch("http://localhost:8000/product");
 
@@ -275,16 +357,11 @@ onMounted(async () => {
 });
 
 //////////////////////********************/////////////////////////
-function search() {
-  console.log("Search");
-}
-
-//////////////////////********************/////////////////////////
 
 function handleFileInput(event) {
   const fileInput = event.target;
   const file = fileInput.files[0];
-  
+
   const allowedTypes = [
     "image/png",
     "image/jpeg",

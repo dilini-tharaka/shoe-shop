@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 export const addSupplierSchema = z.object({
     name: z.string().min(3,'Must be at least 3 characters'),
-    mobile: z.string().min(10,'Must be a valid number').max(10),
+    mobile: z.string().regex(/^\d+$/, 'Must be a valid number').length(10, 'Must be exactly 10 digits'),
     email: z.string().email(),
     address: z.string().nonempty('Must be a valid address'),
     nic: z.string().min(10,'Must be a valid NIC').max(12),

@@ -11,20 +11,58 @@ async function search() {
     const { data: user } = await useFetch(
       `http://localhost:8000/user/${searchedValue.value}`
     );
-    console.log(user);
+    //console.log(user.value);
+
+    if (user.value.data) {
+      Users.value = Array.isArray(user.value.data)
+        ? user.value.data
+        : [user.value.data];
+     // console.log(Users.value);
+    } else {
+      console.log("error");
+      alert("User Not Found");
+    }
   } else if (selected.value === "Mobile") {
     const { data: user } = await useFetch(
       `http://localhost:8000/user/mobile/${searchedValue.value}`
     );
-    console.log(user);
+    //console.log(user.value);
+
+    if (user.value.data) {
+      Users.value = Array.isArray(user.value.data)
+        ? user.value.data
+        : [user.value.data];
+    //  console.log(Users.value);
+    } else {
+      console.log("error");
+      console.log(user);
+      alert("User Not Found");
+    }
   } else if (selected.value === "Role") {
     const { data: user } = await useFetch(
       `http://localhost:8000/user/role/${searchedValue.value}`
     );
-    console.log(user);
+    //console.log(user.value);
+
+    if (user.value.data) {
+      Users.value = Array.isArray(user.value.data)
+        ? user.value.data
+        : [user.value.data];
+     // console.log(Users.value);
+    } else {
+      console.log("error");
+      console.log(user);
+      alert("User Not Found");
+    }
+    return;
   }
 }
 
+function reset() {
+  searchedValue.value = "";
+  selected.value = filterOption[0];
+  Users.value = users.value.data;
+}
 const form = ref({
   firstName: "",
   lastName: "",
@@ -66,7 +104,7 @@ watch(roleId, (newRoleId) => {
 });
 
 ///// ********************************************** /////////
-// Fetching Data
+// Fetching Data for Table
 const Users = ref([]);
 const { data: users } = useFetch("http://localhost:8000/user");
 
@@ -138,10 +176,10 @@ const rows = computed(() => {
 
 //get next user id
 const id = ref(0);
-onMounted(async()=>{
-  const {data} = await useFetch("http://localhost:8000/user/nextid");
+onMounted(async () => {
+  const { data } = await useFetch("http://localhost:8000/user/nextid");
   id.value = data.value.data;
-})
+});
 
 async function addUser() {
   const { data: user } = await useFetch("http://localhost:8000/user", {
@@ -199,6 +237,7 @@ function cancel() {
         icon="solar:minimalistic-magnifer-linear"
         @click="search"
       />
+      <UButton size="2xs" variant="outline" @click="reset">Reset</UButton>
     </div>
     <div class="px-3">
       <UTable :rows="rows" :columns="columns">
@@ -227,7 +266,7 @@ function cancel() {
       <UForm :schema="addUserSchema" :state="form" @submit="addUser">
         <div class="flex gap-4">
           <h1 class="text-lg font-mono font-bold">Add New User</h1>
-          <UBadge color="primary" variant="outline" size="xs">{{id}}</UBadge>
+          <UBadge color="primary" variant="outline" size="xs">{{ id }}</UBadge>
         </div>
         <div class="flex flex-row gap-16 items-center px-2">
           <UFormGroup label="First Name" name="firstName">

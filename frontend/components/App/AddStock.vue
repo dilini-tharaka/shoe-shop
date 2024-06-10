@@ -8,6 +8,62 @@ const filterOption = ["Filter Option", "Brand", "ID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
+//search stock using product ID, brand, name
+async function search() {
+  if (selected.value === "ID") {
+    const { data: stock } = await useFetch(
+      `http://localhost:8000/stock/${searchedValue.value}`
+    );
+    //console.log(stock.value);
+
+    if (stock.value.data) {
+      stockDetails.value = Array.isArray(stock.value.data)
+        ? stock.value.data
+        : [stock.value.data];
+      //console.log(stockDetails.value);
+    } else {
+      console.log("error");
+      alert("Stock Not Found");
+    }
+  } else if (selected.value === "Brand") {
+    const { data: stock } = await useFetch(
+      `http://localhost:8000/stock/brand/${searchedValue.value}`
+    );
+    //console.log(stock.value);
+
+    if (stock.value.data) {
+      stockDetails.value = Array.isArray(stock.value.data)
+        ? stock.value.data
+        : [stock.value.data];
+      //console.log(stockDetails.value);
+    } else {
+      console.log("error");
+      alert("Stock Not Found");
+    }
+  } else if (selected.value === "Name") {
+    const { data: stock } = await useFetch(
+      `http://localhost:8000/stock/name/${searchedValue.value}`
+    );
+    //console.log(stock.value);
+
+    if (stock.value.data) {
+      stockDetails.value = Array.isArray(stock.value.data)
+        ? stock.value.data
+        : [stock.value.data];
+      //console.log(stockDetails.value);
+    } else {
+      console.log("error");
+      alert("Stock Not Found");
+    }
+    return;
+  }
+}
+//Reset the search
+function reset() {
+  searchedValue.value = "";
+  selected.value = filterOption[0];
+  stockDetails.value = shoe.value.data;
+}
 //Table columns for adding stock items
 const columns = [
   {
@@ -436,10 +492,6 @@ async function addStock() {
     btnDisabled.value = false;
   }
 }
-
-function search() {
-  console.log("Search");
-}
 </script>
 
 <template>
@@ -600,6 +652,7 @@ function search() {
           icon="solar:minimalistic-magnifer-linear"
           @click="search"
         />
+        <UButton size="2xs" variant="outline" @click="reset">Reset</UButton>
       </div>
       <UTable :rows="rows" :columns="Columns">
         <template #actions-data="{ row }">

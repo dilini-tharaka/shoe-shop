@@ -72,6 +72,9 @@ user.get("/mobile/:mobile", async (req, res) => {
       where: {
         mobile: mobile,
       },
+      include:{
+        role:true
+      }
     });
     res.json({
       message: "success",
@@ -97,6 +100,9 @@ user.get("/role/:role", async (req, res) => {
           },
         },
       },
+      include:{
+        role:true
+      }
     });
     res.json({
       message: "success",
@@ -209,6 +215,9 @@ user.get("/:id", async (req, res) => {
       where: {
         id: parseInt(id),
       },
+      include:{
+        role:true
+      }
     });
     res.json({
       message: "success",

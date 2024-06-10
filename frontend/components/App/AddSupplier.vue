@@ -123,28 +123,60 @@ onMounted(async () => {
 const filterOption = ["Filter Option", "ID", "Name", "Mobile"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
+
 //search function for suppliers || search by id, name, mobile
 async function search() {
   if (selected.value === "ID") {
     const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/${searchedValue.value}`
     );
-    console.log(supplier);
+    console.log(supplier.value);
+
+    if (supplier.value.data) {
+      Suppliers.value = Array.isArray(supplier.value.data)
+        ? supplier.value.data
+        : [supplier.value.data];
+    } else {
+      alert("Supplier not found");
+    }
   } else if (selected.value === "Name") {
     const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/name/${searchedValue.value}`
     );
-    console.log(supplier);
+    console.log(supplier.value);
+
+    if (supplier.value.data) {
+      Suppliers.value = Array.isArray(supplier.value.data)
+        ? supplier.value.data
+        : [supplier.value.data];
+    } else {
+      alert("Supplier not found");
+    }
   } else if (selected.value === "Mobile") {
     const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/mobile/${searchedValue.value}`
     );
-    console.log(supplier);
+    console.log(supplier.value);
+
+    if (supplier.value.data) {
+      Suppliers.value = Array.isArray(supplier.value.data)
+        ? supplier.value.data
+        : [supplier.value.data];
+    } else {
+      alert("Supplier not found");
+    }
   }
 }
 
+//reset search
+function reset() {
+  searchedValue.value = "";
+  selected.value = filterOption[0];
+  Suppliers.value = suppliers.value.data;
+}
+////add brand
 function addBrand() {
-  isBrand.value = true
+  isBrand.value = true;
 }
 function cancel() {
   form.value = {
@@ -205,6 +237,7 @@ function addSupplier() {
         icon="solar:minimalistic-magnifer-linear"
         @click="search"
       />
+      <UButton size="2xs" variant="outline" @click="reset">Reset</UButton>
     </div>
     <div class="px-3">
       <UTable :rows="rows" :columns="columns">
