@@ -7,6 +7,11 @@ const searchedValue = ref("");
 
 //Search user by id, mobile, role
 async function search() {
+  if (searchedValue.value === "") {
+    alert("Please Enter a Value to Search");
+    return;
+  }
+  
   if (selected.value === "ID") {
     const { data: user } = await useFetch(
       `http://localhost:8000/user/${searchedValue.value}`

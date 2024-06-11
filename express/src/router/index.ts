@@ -5,3 +5,4 @@ export * from "./supplier";
 export * from "./product";
 export * from "./invoice";
 export * from "./stock";
+export * from "./searchProduct"

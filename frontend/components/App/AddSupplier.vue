@@ -126,6 +126,10 @@ const searchedValue = ref("");
 
 //search function for suppliers || search by id, name, mobile
 async function search() {
+  if (searchedValue.value === "") {
+    return alert("Please enter a value to search");
+  }
+  
   if (selected.value === "ID") {
     const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/${searchedValue.value}`

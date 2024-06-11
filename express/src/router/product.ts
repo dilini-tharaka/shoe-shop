@@ -369,6 +369,7 @@ product.get("/", async (req, res) => {
     //   qty: product.stockdetails.length > 0 ? product.stockdetails[0].qty : 0,
     // }));
 
+    // identify the first stock detail entry that has a quantity greater than zero.
     const orderedProducts = products.map((product) => {
       let currentStockIndex = 0;
       while (
@@ -569,11 +570,51 @@ product.get("/:id", async (req, res) => {
             },
           },
         },
+        stockdetails: {
+          orderBy: {
+            id: "asc",
+          },
+        },
       },
     });
+
+    if (!product) {
+      res.json({
+        message: "error",
+      });
+      return;
+    }
+
+    // Find the first available stock detail with quantity greater than 0
+    let currentStockDetail = null;
+    for (const stockDetail of product.stockdetails) {
+      if (stockDetail.qty > 0) {
+        currentStockDetail = stockDetail;
+        break;
+      }
+    }
+    //format data
+    const result = {
+      id: product.id,
+      size: product.sizes.size,
+      length: product.sizes.length,
+      color: product.shoeshascolors.colors.name,
+      name: product.shoeshascolors.shoes.name,
+      brand: product.shoeshascolors.shoes.brand.name,
+      category:
+        product.shoeshascolors.shoes.shoeshascategory &&
+        product.shoeshascolors.shoes.shoeshascategory.length > 0
+          ? product.shoeshascolors.shoes.shoeshascategory[0].category.name
+          : "", // Default value
+      buying_price: currentStockDetail ? currentStockDetail.buying_price : 0,
+      selling_price: currentStockDetail ? currentStockDetail.selling_price : 0,
+      barcode: currentStockDetail ? currentStockDetail.barcode : "",
+      qty: currentStockDetail ? currentStockDetail.qty : 0,
+    };
+
     res.json({
       message: "success",
-      data: product,
+      data: result,
     });
   } catch (error: any) {
     res.json({
@@ -585,7 +626,17 @@ product.get("/:id", async (req, res) => {
 
 //Create a new product
 product.post("/", upload.single("image"), async (req, res) => {
-  const { size, selectedSize, color, selectedColor, brand, name, selectedName, category, selectedCategory } = req.body;
+  const {
+    size,
+    selectedSize,
+    color,
+    selectedColor,
+    brand,
+    name,
+    selectedName,
+    category,
+    selectedCategory,
+  } = req.body;
   try {
     console.log(req.file);
     if (!req.file) {

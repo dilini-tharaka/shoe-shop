@@ -11,6 +11,10 @@ const shoe = ref([]);
 
 //Search product by id, brand, color, size, name
 async function search() {
+  if (searchedValue.value === "") {
+    alert("Please enter a value to search");
+    return;
+  }
   if (selected.value === "ID") {
     const { data: product } = await useFetch(
       `http://localhost:8000/product/${searchedValue.value}`
@@ -28,9 +32,9 @@ async function search() {
     }
   } else if (selected.value === "Brand") {
     const { data: product } = await useFetch(
-      `http://localhost:8000/product/brand/${searchedValue.value}`
+      `http://localhost:8000/searchProduct/brand/${searchedValue.value}`
     );
-    //console.log(product.value);
+    console.log(product.value);
 
     if (product.value.data) {
       shoe.value = Array.isArray(product.value.data)
@@ -44,11 +48,11 @@ async function search() {
     }
   } else if (selected.value === "Color") {
     const { data: product } = await useFetch(
-      `http://localhost:8000/product/color/${searchedValue.value}`
+      `http://localhost:8000/searchProduct/color/${searchedValue.value}`
     );
     //console.log(product.value);
 
-    if (product.value.data) {
+    if (product.value.data && product.value.message === "success") {
       shoe.value = Array.isArray(product.value.data)
         ? product.value.data
         : [product.value.data];
@@ -60,8 +64,9 @@ async function search() {
     }
   } else if (selected.value === "Size") {
     const { data: product } = await useFetch(
-      `http://localhost:8000/product/size/${searchedValue.value}`
+      `http://localhost:8000/searchProduct/size/${searchedValue.value}`
     );
+    //console.log(searchedValue.value);
     //console.log(product.value);
 
     if (product.value.data) {
@@ -76,7 +81,7 @@ async function search() {
     }
   } else if (selected.value === "Name") {
     const { data: product } = await useFetch(
-      `http://localhost:8000/product/shoe/${searchedValue.value}`
+      `http://localhost:8000/searchProduct/name/${searchedValue.value}`
     );
     //console.log(product.value);
 
@@ -89,6 +94,13 @@ async function search() {
     console.log("error");
     alert("Product Not Found");
   }
+}
+
+// Reset search
+function reset() {
+  searchedValue.value = "";
+  selected.value = filterOption[0];
+  shoe.value = products.value.data;
 }
 //////////////////////********************/////////////////////////
 // Fetching Data to display in table
@@ -502,6 +514,7 @@ function addName() {
         icon="solar:minimalistic-magnifer-linear"
         @click="search"
       />
+      <UButton size="2xs" variant="outline" @click="reset">Reset</UButton>
     </div>
     <div class="px-3">
       <UTable :rows="rows" :columns="columns">
