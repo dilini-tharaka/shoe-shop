@@ -235,17 +235,17 @@ user.get("/:id", async (req, res) => {
 user.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const name = `${req.body.firstName} ${req.body.lastName}`;
     const employee = await prisma.user.update({
       where: {
         id: parseInt(id),
       },
       data: {
-        name: req.body.name,
+        name: name,
         mobile: req.body.mobile,
         nic: req.body.nic,
         email: req.body.email,
         userName: req.body.userName,
-        password: req.body.password,
         role: {
           connect: {
             id: req.body.role_id,

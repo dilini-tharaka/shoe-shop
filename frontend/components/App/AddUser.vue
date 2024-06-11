@@ -1,5 +1,6 @@
 <script setup>
 import { addUserSchema } from "~/schema";
+import {updateUserSchema} from "~/schema";
 // Search Filter
 const filterOption = ["Filter Option", "ID", "Mobile", "Role"];
 const selected = ref(filterOption[0]);
@@ -11,7 +12,7 @@ async function search() {
     alert("Please Enter a Value to Search");
     return;
   }
-  
+
   if (selected.value === "ID") {
     const { data: user } = await useFetch(
       `http://localhost:8000/user/${searchedValue.value}`
@@ -22,7 +23,7 @@ async function search() {
       Users.value = Array.isArray(user.value.data)
         ? user.value.data
         : [user.value.data];
-     // console.log(Users.value);
+      // console.log(Users.value);
     } else {
       console.log("error");
       alert("User Not Found");
@@ -37,7 +38,7 @@ async function search() {
       Users.value = Array.isArray(user.value.data)
         ? user.value.data
         : [user.value.data];
-    //  console.log(Users.value);
+      //  console.log(Users.value);
     } else {
       console.log("error");
       console.log(user);
@@ -53,7 +54,7 @@ async function search() {
       Users.value = Array.isArray(user.value.data)
         ? user.value.data
         : [user.value.data];
-     // console.log(Users.value);
+      // console.log(Users.value);
     } else {
       console.log("error");
       console.log(user);
@@ -109,6 +110,21 @@ watch(roleId, (newRoleId) => {
 });
 
 ///// ********************************************** /////////
+const editForm = ref({
+  id: 0,
+  firstName: "",
+  lastName: "",
+  nic: "",
+  mobile: "",
+  email: "",
+  role_id: "",
+  selectedRole: "",
+  userName: "",
+  password: "",
+});
+
+//////////////////////////////////////////
+
 // Fetching Data for Table
 const Users = ref([]);
 const { data: users } = useFetch("http://localhost:8000/user");
@@ -154,7 +170,7 @@ const items = (row) => [
     {
       label: "Edit",
       icon: "solar:gallery-edit-line-duotone",
-      click: () => console.log("Edit", row.id),
+      click: () => openEditForm(row),
     },
     {
       label: "More Info",
@@ -185,6 +201,8 @@ onMounted(async () => {
   const { data } = await useFetch("http://localhost:8000/user/nextid");
   id.value = data.value.data;
 });
+
+
 
 async function addUser() {
   const { data: user } = await useFetch("http://localhost:8000/user", {
@@ -223,6 +241,55 @@ function cancel() {
     userName: "",
     password: "",
   };
+}
+
+//update user
+function openEditForm(user) {
+  if (!user.id) {
+    console.error("User is undefined");
+    return;
+  }
+
+  // Split the name into firstName and lastName
+  const [firstName, lastName] = user.name.split(' ');
+
+  editForm.value = {
+    id: user.id,
+    firstName: firstName,
+    lastName: lastName,
+    nic: user.nic,
+    mobile: user.mobile,
+    email: user.email,
+    role_id: user.role.id,
+    selectedRole: user.role.name,
+    userName: user.userName,
+    password: "",
+  };
+}
+
+async function updateUser() {
+  const {data} = await useFetch(`http://localhost:8000/user/${editForm.value.id}`, {
+    method: "PATCH",
+    body: JSON.stringify(editForm.value),
+  });
+
+  if (data.value.data && data.value.message === "success") {
+    editForm.value = {
+      id: 0,
+      firstName: "",
+      lastName: "",
+      nic: "",
+      mobile: "",
+      email: "",
+      role_id: "",
+      selectedRole: "",
+      userName: "",
+      password: "",
+    };
+    return alert("User Updated Successfully");
+  } else {
+    return alert("User Updating Failed");
+  }
 }
 </script>
 
@@ -267,7 +334,72 @@ function cancel() {
         />
       </div>
     </div>
-    <div class="w-full flex flex-col px-3 pb-3">
+
+    <!-- Edit User -->
+    <div
+      v-if="editForm.id"
+      class="w-full flex flex-col px-3 pb-5"
+    >
+      <UForm :schema="updateUserSchema" :state="editForm" @submit="updateUser">
+        <div class="flex gap-4">
+          <h1 class="text-lg font-mono font-bold">Edit User</h1>
+          <UBadge color="primary" variant="outline" size="xs">{{
+            editForm.id
+          }}</UBadge>
+        </div>
+        <div class="flex flex-row gap-16 items-center px-2">
+          <UFormGroup label="First Name" name="firstName">
+            <UInput v-model="editForm.firstName" />
+          </UFormGroup>
+
+          <UFormGroup label="Last Name" name="lastName">
+            <UInput v-model="editForm.lastName" />
+          </UFormGroup>
+
+          <UFormGroup label="NIC" name="nic">
+            <UInput v-model="editForm.nic" />
+          </UFormGroup>
+        </div>
+
+        <div class="flex flex-row gap-16 items-center p-2">
+          <UFormGroup label="Mobile" name="mobile">
+            <UInput v-model="editForm.mobile" />
+          </UFormGroup>
+
+          <UFormGroup label="Email" class="w-2/5" name="email">
+            <UInput v-model="editForm.email" />
+          </UFormGroup>
+        </div>
+
+        <div class="flex flex-row gap-16 items-center p-2">
+          <UFormGroup label="Role" class="w-2/12" name="selectedRole">
+            <USelectMenu
+              color="primary"
+              :options="Roles"
+              v-model="editForm.selectedRole"
+            />
+          </UFormGroup>
+
+          <UFormGroup label="User Name" name="userName">
+            <UInput v-model="editForm.userName" />
+          </UFormGroup>
+
+          <UFormGroup label="Password" name="password">
+            <UInput v-model="editForm.password" disabled/>
+          </UFormGroup>
+          <div class="flex flex-wrap items-center gap-2 w-2/5">
+            <UButton type="submit" color="primary" variant="solid" block
+              >Update User</UButton
+            >
+            <UButton color="gray" variant="solid" block @click="cancelEdit"
+              >Cancel</UButton
+            >
+          </div>
+        </div>
+      </UForm>
+    </div>
+
+    <div v-if="!editForm.id" class="w-full flex flex-col px-3 pb-3">
       <UForm :schema="addUserSchema" :state="form" @submit="addUser">
         <div class="flex gap-4">
           <h1 class="text-lg font-mono font-bold">Add New User</h1>
@@ -324,5 +456,7 @@ function cancel() {
         </div>
       </UForm>
     </div>
+
+    
   </div>
 </template>

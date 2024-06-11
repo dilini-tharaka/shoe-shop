@@ -1,6 +1,24 @@
 <script setup>
 import { addSupplierSchema } from "~/schema";
 
+//slideover for add brand
+const isBrand = ref(false);
+
+//select menu for bank name
+const bankName = ["BOC", "Sampath", "Peoples"];
+const form = ref({
+  id: 0,
+  name: "",
+  mobile: "",
+  email: "",
+  address: "",
+  nic: "",
+  selectedBank: bankName[0],
+  accountHolderName: "",
+  accountNumber: "",
+  branch: "",
+  checkedBrands: [],
+});
 // Fetching suppliers from the backend to display in the table
 const Suppliers = ref([]);
 const { data: suppliers } = useFetch("http://localhost:8000/supplier");
@@ -60,7 +78,7 @@ const items = (row) => [
     {
       label: "Edit",
       icon: "solar:gallery-edit-line-duotone",
-      click: () => console.log("Edit", row.id),
+      click: () => openEditForm(row),
     },
     {
       label: "More Info",
@@ -90,25 +108,6 @@ const district = ["Colombo", "Gampaha", "Kalutara", "Kandy", "Galle"];
 
 //checkbox for available brands
 
-//slideover for add brand
-const isBrand = ref(false);
-
-//select menu for bank name
-const bankName = ["BOC", "Sampath", "Peoples"];
-
-const form = ref({
-  name: "",
-  mobile: "",
-  email: "",
-  address: "",
-  nic: "",
-  selectedBank: bankName[0],
-  accountHolderName: "",
-  accountNumber: "",
-  branch: "",
-  checkedBrands: [],
-});
-
 //get next supplir id
 const id = ref(0);
 onMounted(async () => {
@@ -129,7 +128,7 @@ async function search() {
   if (searchedValue.value === "") {
     return alert("Please enter a value to search");
   }
-  
+
   if (selected.value === "ID") {
     const { data: supplier } = await useFetch(
       `http://localhost:8000/supplier/${searchedValue.value}`
@@ -184,6 +183,7 @@ function addBrand() {
 }
 function cancel() {
   form.value = {
+    id: 0,
     name: "",
     mobile: "",
     email: "",
@@ -197,9 +197,76 @@ function cancel() {
   };
 }
 
-//add supplier
-function addSupplier() {
-  const { data: supplier } = useFetch("http://localhost:8000/supplier", {
+//edit supplier
+function openEditForm(supplier) {
+  if (!supplier.id) {
+    console.error("Supplier is undefined");
+    return;
+  }
+
+  // Find brand IDs corresponding to the supplier's brands
+  const brandIds = supplier.brands
+    .map((brandName) => {
+      const brand = Brands.value.find((b) => b.name === brandName);
+      return brand ? brand.id : null;
+    })
+    .filter((id) => id !== null);
+
+  form.value = {
+    id: supplier.id,
+    name: supplier.name,
+    mobile: supplier.mobile,
+    email: supplier.email,
+    address: supplier.address,
+    nic: supplier.nic,
+    selectedBank: supplier.bankdetails
+      ? supplier.bankdetails.bank_name
+      : bankName[0],
+    accountHolderName: supplier.bankdetails
+      ? supplier.bankdetails.account_owner
+      : "",
+    accountNumber: supplier.bankdetails ? supplier.bankdetails.account_no : "",
+    branch: supplier.bankdetails ? supplier.bankdetails.branch : "",
+    checkedBrands: brandIds || [],
+  };
+}
+
+//add and update supplier
+async function addSupplier() {
+  // Update existing supplier
+  console.log("value");
+  if (form.value.id) {
+    console.log(form.value);
+    const { data: supplier } = await useFetch(
+      `http://localhost:8000/supplier/${form.value.id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(form.value),
+      }
+    );
+    if (supplier && supplier.value.message === "success") {
+      form.value = {
+        id: 0,
+        name: "",
+        mobile: "",
+        email: "",
+        address: "",
+        nic: "",
+        selectedBank: bankName[0],
+        accountHolderName: "",
+        accountNumber: "",
+        branch: "",
+        checkedBrands: [],
+      };
+      return alert("Supplier updated successfully");
+    } else {
+      console.log(supplier.value);
+      return alert("Error! Please try again");
+    }
+    return;
+  }
+  //add supplier
+  const { data: supplier } = await useFetch("http://localhost:8000/supplier", {
     method: "POST",
     body: JSON.stringify(form.value),
   });
@@ -207,6 +274,7 @@ function addSupplier() {
 
   if (supplier && supplier.value.message === "success") {
     form.value = {
+      id: 0,
       name: "",
       mobile: "",
       email: "",
@@ -269,9 +337,13 @@ function addSupplier() {
     <div class="w-full flex flex-col gap-2">
       <UForm :schema="addSupplierSchema" :state="form" @submit="addSupplier">
         <div class="flex gap-5">
-          <h1 class="text-lg font-mono font-bold">Add New Supplier</h1>
+          <h1 class="text-lg font-mono font-bold">
+            {{ form.id ? "Edit Supplier" : "Add New Supplier" }}
+          </h1>
           <h1>ID</h1>
-          <UBadge color="primary" variant="outline" size="xs">{{ id }}</UBadge>
+          <UBadge color="primary" variant="outline" size="xs">{{
+            form.id ? form.id : id
+          }}</UBadge>
         </div>
         <div class="w-full flex flex-row gap-16 items-center">
           <UFormGroup label="Name" name="name">
@@ -353,9 +425,9 @@ function addSupplier() {
           </div>
         </div>
         <div class="w-1/2 flex items-center gap-2 pt-4">
-          <UButton type="submit" color="primary" variant="solid" block
-            >Add Supplier</UButton
-          >
+          <UButton type="submit" color="primary" variant="solid" block>{{
+            form.id ? "Update Supplier" : "Add Supplier"
+          }}</UButton>
           <UButton color="gray" variant="solid" @click="cancel" block
             >Cancel</UButton
           >

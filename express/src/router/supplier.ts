@@ -29,7 +29,7 @@ supplier.get("/", async (req, res) => {
       brands: supplier.supplierhasbrands.map((supplierhasbrand) => {
         return supplierhasbrand.brand.name;
       }),
-    })); 
+    }));
     res.json({
       message: "success",
       data: suppliersWithBrands,
@@ -68,38 +68,81 @@ supplier.get("/nextid", async (req, res) => {
 
 //create a new supplier
 supplier.post("/", async (req, res) => {
+  // try {
+  //   const supplier = await prisma.supplier.create({
+  //     data: {
+  //       name: req.body.name,
+  //       email: req.body.email,
+  //       mobile: req.body.mobile,
+  //       nic: req.body.nic,
+  //       address: req.body.address,
+  //       created_at: new Date(),
+  //       bankdetails: {
+  //         create: {
+  //           bank_name: req.body.selectedBank,
+  //           branch: req.body.branch,
+  //           account_no: req.body.accountNumber,
+  //           account_owner: req.body.accountHolderName,
+  //         },
+  //       },
+  //       supplierhasbrands: {
+  //         create: req.body.checkedBrands.map((brandID: number) => ({
+  //           brand: {
+  //             connect: {
+  //               id: brandID,
+  //             },
+  //           },
+  //         })),
+  //       },
+  //     },
+  //   });
+  //   //console.log(req.body);
+  //   res.json({
+  //     message: "success",
+  //     data: supplier,
+  //   });
+  // } catch (error: any) {
+  //   res.json({
+  //     message: "error",
+  //     data: error.message,
+  //   });
+  // }
+
   try {
-    const supplier = await prisma.supplier.create({
-      data: {
-        name: req.body.name,
-        email: req.body.email,
-        mobile: req.body.mobile,
-        nic: req.body.nic,
-        address: req.body.address,
-        created_at: new Date(),
-        bankdetails: {
-          create: {
-            bank_name: req.body.selectedBank,
-            branch: req.body.branch,
-            account_no: req.body.accountNumber,
-            account_owner: req.body.accountHolderName,
+    const result = await prisma.$transaction(async (prisma) => {
+      //create new supplier
+      const supplier = await prisma.supplier.create({
+        data: {
+          name: req.body.name,
+          email: req.body.email,
+          mobile: req.body.mobile,
+          nic: req.body.nic,
+          address: req.body.address,
+          created_at: new Date(),
+          bankdetails: {
+            create: {
+              bank_name: req.body.selectedBank,
+              branch: req.body.branch,
+              account_no: req.body.accountNumber,
+              account_owner: req.body.accountHolderName,
+            },
+          },
+          supplierhasbrands: {
+            create: req.body.checkedBrands.map((brandID: number) => ({
+              brand: {
+                connect: {
+                  id: brandID,
+                },
+              },
+            })),
           },
         },
-        supplierhasbrands: {
-          create: req.body.checkedBrands.map((brandID: number) => ({
-            brand: {
-              connect: {
-                id: brandID,
-              },
-            },
-          })),
-        },
-      },
+      });
+      return supplier;
     });
-    //console.log(req.body);
     res.json({
       message: "success",
-      data: supplier,
+      data: result,
     });
   } catch (error: any) {
     res.json({
@@ -179,6 +222,17 @@ supplier.get("/mobile/:mobile", async (req, res) => {
 //update a supplier using id
 supplier.patch("/:id", async (req, res) => {
   try {
+    const bankDatails = await prisma.bankdetails.findFirst({
+      where: {
+        AND: [
+          { bank_name: req.body.selectedBank },
+          { branch: req.body.branch },
+          { account_no: req.body.accountNumber },
+          { account_owner: req.body.accountHolderName },
+        ],
+      },
+    });
+
     const { id } = req.params;
     const supplier = await prisma.supplier.update({
       where: {
@@ -190,18 +244,32 @@ supplier.patch("/:id", async (req, res) => {
         mobile: req.body.mobile,
         nic: req.body.nic,
         address: req.body.address,
+
+        // Connect to existing bank details or create new ones if they don't exist
         bankdetails: {
-          create: {
-            bank_name: req.body.bankdetails.bank_name,
-            branch: req.body.bankdetails.branch,
-            account_no: req.body.bankdetails.account_no,
-            account_owner: req.body.bankdetails.account_owner,
-          },
+          connect: bankDatails ? { id: bankDatails.id } : undefined,
+          create: !bankDatails
+            ? {
+                bank_name: req.body.selectedBank,
+                branch: req.body.branch,
+                account_no: req.body.accountNumber,
+                account_owner: req.body.accountHolderName,
+              }
+            : undefined,
+        },
+        supplierhasbrands: {
+          create: req.body.checkedBrands.map((brandID: number) => ({
+            brand: {
+              connect: {
+                id: brandID,
+              },
+            },
+          })),
         },
       },
     });
     res.json({
-      message: "successfully updated",
+      message: "success",
       data: supplier,
     });
   } catch (error: any) {

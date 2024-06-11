@@ -318,11 +318,11 @@ const Columns = [
 
 const items = (row) => [
   [
-    {
-      label: "Edit",
-      icon: "solar:gallery-edit-line-duotone",
-      click: () => console.log("Edit", row.id),
-    },
+    // {
+    //   label: "Edit",
+    //   icon: "solar:gallery-edit-line-duotone",
+    //   click: () => console.log("Edit", row.id),
+    // },
     {
       label: "More Info",
       icon: "solar:info-circle-broken",
