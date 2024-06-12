@@ -647,6 +647,38 @@ product.post("/", upload.single("image"), async (req, res) => {
       return;
     }
 
+    // Check if the product already exists in the database
+    const existingProduct = await prisma.product.findFirst({
+      where: {
+        shoeshascolors: {
+          shoes: {
+            brand_id: parseInt(brand),
+            name: selectedName,
+            shoeshascategory: {
+              some: {
+                Category_id: parseInt(category),
+              },
+            },
+          },
+          colors: {
+            id: parseInt(color),
+          },
+        },
+        sizes: {
+          id: parseInt(size),
+        },
+      },
+    });
+
+    // If the product already exists, respond with an error
+    if (existingProduct) {
+      res.json({
+        message: "error",
+        data: "Product already exists",
+      });
+      return;
+    }
+
     const existingShoe = await prisma.shoes.findFirst({
       where: {
         name: selectedName,

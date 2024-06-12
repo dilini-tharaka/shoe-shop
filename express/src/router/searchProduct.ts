@@ -360,4 +360,46 @@ product.get("/name/:name", async (req, res) => {
     });
   }
 });
+
+product.get("/:brand/:category/:color/:size/:name", async (req, res) => {
+const { name, brand, category, color, size } = req.params;
+// Check if the product already exists in the database
+const existingProduct = await prisma.product.findFirst({
+  where: {
+    shoeshascolors: {
+      shoes: {
+        brand_id: parseInt(brand),
+        name: name,
+        shoeshascategory:{
+          some: {
+            Category_id: parseInt(category),
+          }
+        }
+      },
+      colors: {
+        id: parseInt(color),
+      },
+    },
+    sizes:{
+      id: parseInt(size),
+    }
+
+  },
+  
+});
+
+// If the product already exists, respond with an error
+if (existingProduct) {
+  res.json({
+    message: "Product already exists",
+    data:  existingProduct,
+  });
+  return;
+}
+res.json({
+  message: "Product does not exist",
+  data: existingProduct,
+});
+});
+
 export const SearchProduct = product;

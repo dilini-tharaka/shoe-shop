@@ -434,6 +434,23 @@ async function addProduct() {
 
     console.log(data.data.value);
 
+    if(data.data.value.data === "Product already exists"){
+      alert("Product already exists");
+      form.value = {
+        size: 0,
+        selectedSize: "",
+        color: 0,
+        selectedColor: "",
+        brand: 0,
+        name: 0,
+        selectedName: "",
+        category: 0,
+        selectedCategory: "",
+        image: null,
+      };
+      btnDisabled.value = false;
+      return;
+    }
     if (data.data.value && data.data.value.message === "success") {
       form.value = {
         size: 0,
@@ -464,17 +481,17 @@ async function addProduct() {
 }
 
 function cancel() {
-  // form.value = {
-  //   size: 0,
-  //   selectedSize: "",
-  //   color: 0,
-  //   selectedColor: "",
-  //   brand: 0,
-  //   name: 0,
-  //   selectedName: "",
-  //   category: 0,
-  //   selectedCategory: "",
-  // };
+  form.value = {
+    size: 0,
+    selectedSize: "",
+    color: 0,
+    selectedColor: "",
+    brand: 0,
+    name: 0,
+    selectedName: "",
+    category: 0,
+    selectedCategory: "",
+  };
   console.log(form.value);
 }
 
