@@ -15,16 +15,24 @@ export const useAuthStore = defineStore("auth", {
       this.role = userData.role_id; // Set the user role by the role_id
       this.isLoggedIn = !!userData;
       // console.log("Role: ", this.role);
-      console.log("working");
-      console.log(this.isLoggedIn);
+      // console.log("working");
+      // console.log(this.isLoggedIn);
+
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(this.user));
+      localStorage.setItem("role", this.role.toString());
+      localStorage.setItem("isLoggedIn", this.isLoggedIn.toString());
     },
     clearUser() {
       this.user = null;
       this.role = 0;
       this.isLoggedIn = false;
+
+      // Clear from localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      localStorage.removeItem("isLoggedIn");
     },
   },
-  getters: {
-    
-  },
+  getters: {},
 });

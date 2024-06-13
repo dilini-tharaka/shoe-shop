@@ -84,7 +84,7 @@ async function login() {
           </div>
 
           <UButton type="submit" class="mt-5" block>Login</UButton>
-          <UButton to="/" variant="outline" block>Cancel</UButton>
+          <UButton to="/app/ecommerce" variant="outline" block>Cancel</UButton>
         </UForm>
 
         <div class="flex justify-center py-5">

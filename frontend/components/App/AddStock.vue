@@ -469,7 +469,7 @@ async function addStock() {
   const { data: stock } = await useFetch("http://localhost:8000/stock", {
     method: "POST",
     body: JSON.stringify({
-      stockManagerID: authStore.role,
+      stockManagerID: authStore.user.id,
       supplierID: script.value.supplierID,
       paidAmount: script.value.paidAmount,
       total: total.value,

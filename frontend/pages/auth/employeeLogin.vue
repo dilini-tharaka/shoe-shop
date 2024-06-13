@@ -7,6 +7,7 @@ useHead({
 });
 
 const authStore = useAuthStore();
+
 const selected = ref(false);
 
 const form = ref({
@@ -63,7 +64,7 @@ async function login() {
     //console.log("User data set in store: ", authStore.user);
     console.log("User role in store: ", authStore.role);
     // Save user data to localStorage
-    localStorage.setItem("user", JSON.stringify(user.value.data));
+    //localStorage.setItem("user", JSON.stringify(user.value.data));
 
     // Redirect to dashboard
     const firstPath = sidebarPath.value[authStore.role][0].to;  // Get the first path of the user role
@@ -118,7 +119,7 @@ async function login() {
               label="Remember Me"
             />
             <ULink
-              to="/"
+              to=""
               class="underline"
               active-class="text-primary"
               inactive-class="text-primary"

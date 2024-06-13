@@ -100,7 +100,7 @@ async function register() {
             >
               Register
             </UButton>
-            <UButton to="/" variant="outline" block>Cancel</UButton>
+            <UButton to="/app/ecommerce" variant="outline" block>Cancel</UButton>
           </div>
         </UForm>
         <div class="flex justify-center">

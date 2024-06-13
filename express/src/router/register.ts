@@ -12,6 +12,7 @@ register.get("/", async(req, res) => {
   });
 });
 
+//Registration for new customer
 register.post("/", async (req, res) => {
   try {
     const customer = await prisma.customer.create({

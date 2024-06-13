@@ -24,6 +24,7 @@ app.use("/product", Route.Product);
 app.use("/invoice", Route.Invoice);
 app.use("/stock", Route.Stock);
 app.use("/searchProduct", Route.SearchProduct);
+app.use("/report", Route.Report);
 
 // Serve static files from the 'uploads' directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

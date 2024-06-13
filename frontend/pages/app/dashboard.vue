@@ -1,4 +1,9 @@
 <script setup>
+import { useAuthStore } from "~/store";
+// definePageMeta({
+//   middleware: ["auth"]
+// });
+
 const isSidebarOpen = ref(true);
 
 useHead({
@@ -16,7 +21,7 @@ function toggleMenu() {
       <div
         class="w-full min-h-screen p-8 bg-bkg-primary rounded-lg shadow dark:shadow-black"
       >
-        <AppAddStock />
+        <AppReport />
       </div>
     </NuxtLayout>
   </div>

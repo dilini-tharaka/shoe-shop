@@ -5,12 +5,11 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
+
 const isSidebarOpen = ref(true);
 
 function toggleMenu() {
   isSidebarOpen.value = !isSidebarOpen.value;
-  console.log(authStore.role);
-  console.log(authStore.isLoggedIn);
   //console.log(isSidebarOpen.value);
 }
 

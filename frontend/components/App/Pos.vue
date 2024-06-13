@@ -146,7 +146,7 @@ async function print() {
   btnDisabled.value = true;
 
   const printData = ref({
-    Cashier_id: authStore.role, // Need to change
+    Cashier_id: authStore.user.id, 
     invoiceitem: purchesedItems.value.map((item) => {
       return {
         id: parseInt(item.id),
@@ -158,7 +158,7 @@ async function print() {
     }),
   });
 
-  //console.log(printData.value);
+  console.log(printData.value);
 
   const { data: addinvoice } = await useFetch("http://localhost:8000/invoice", {
     method: "POST",

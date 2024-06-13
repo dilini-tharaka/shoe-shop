@@ -28,13 +28,18 @@ const wishedIcon = computed(() => {
 function getPrice(size, index) {
   shoes.value[index].price = size.price;
 }
+
+const navigateToProduct = (productId) => {
+  navigateTo(`/app/products/${productId}`);
+};
 </script>
 
 <template>
   <div
-    class="w-80 h-96 flex flex-col rounded bg-bkg-primary shadow-lg dark:shadow-black"
+    class="w-80 h-96 flex flex-col rounded bg-bkg-primary shadow-lg dark:shadow-black cursor-pointer"
     v-for="(shoe, index) in shoes"
     :key="shoe.index"
+    @click="navigateToProduct(shoe.id)"
   >
     <div
       :class="'w-full h-1/2 bg-center bg-cover bg-no-repeat'"
