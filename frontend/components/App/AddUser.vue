@@ -229,6 +229,7 @@ async function addUser() {
   }
 }
 
+//cancel add user
 function cancel() {
   form.value = {
     firstName: "",
@@ -243,6 +244,21 @@ function cancel() {
   };
 }
 
+//cancel edit user
+function cancelEdit() {
+  editForm.value = {
+    id: 0,
+    firstName: "",
+    lastName: "",
+    nic: "",
+    mobile: "",
+    email: "",
+    role_id: "",
+    selectedRole: "",
+    userName: "",
+    password: "",
+  };
+}
 //update user
 function openEditForm(user) {
   if (!user.id) {

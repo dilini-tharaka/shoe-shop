@@ -2,6 +2,9 @@
 import { getProductSchema } from "~/schema";
 import { addItemSchema } from "~/schema";
 import { addStockSchema } from "~/schema";
+import { useAuthStore } from "~/store";
+
+const authStore = useAuthStore();
 
 // Filter
 const filterOption = ["Filter Option", "Brand", "ID", "Name"];
@@ -466,6 +469,7 @@ async function addStock() {
   const { data: stock } = await useFetch("http://localhost:8000/stock", {
     method: "POST",
     body: JSON.stringify({
+      stockManagerID: authStore.role,
       supplierID: script.value.supplierID,
       paidAmount: script.value.paidAmount,
       total: total.value,

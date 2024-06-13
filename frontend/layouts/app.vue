@@ -1,11 +1,115 @@
 <script setup>
+import { useAuthStore } from "~/store";
+definePageMeta({
+  middleware: ["auth"]
+});
+
+const authStore = useAuthStore();
 const isSidebarOpen = ref(true);
 
 function toggleMenu() {
   isSidebarOpen.value = !isSidebarOpen.value;
-
+  console.log(authStore.role);
+  console.log(authStore.isLoggedIn);
   //console.log(isSidebarOpen.value);
 }
+
+// Define roles and their respective sidebar items
+const sidebarItems = ref({
+  1: [
+    // admin is 1
+    {
+      title: "Dashboard",
+      to: "/app/dashboard",
+    },
+    {
+      title: "Users",
+
+      to: "/app/user/add",
+    },
+    {
+      title: "Suppliers",
+
+      to: "/app/supplier/add",
+    },
+    {
+      title: "Products",
+      to: "/app/products/add",
+    },
+    {
+      title: "POS",
+      to: "/app/pos",
+    },
+    {
+      title: "Stock",
+      to: "/app/stock/add",
+    },
+
+    {
+      title: "Logout",
+      action: () => authStore.clearUser(), // Clear user data from store logout
+      to: "/auth/employeeLogin",
+    },
+  ],
+  2: [
+    //Stock Manager is 2
+    {
+      title: "Dashboard",
+      to: "/app/dashboard",
+    },
+    {
+      title: "Products",
+      to: "/app/products/add",
+    },
+    {
+      title: "Suppliers",
+      to: "/app/supplier/add",
+    },
+    {
+      title: "Stock",
+      to: "/app/stock/add",
+    },
+
+    {
+      title: "Logout",
+      action: () => authStore.clearUser(),
+      to: "/auth/employeeLogin",
+    },
+  ],
+
+  3: [
+    //sales Assistant 3
+    {
+      title: "Products",
+      to: "/app/products/add",
+    },
+    {
+      title: "Logout",
+      action: () => authStore.clearUser(),
+      to: "/auth/employeeLogin",
+    },
+  ],
+  4: [
+    //cashier is 4
+    {
+      title: "POS",
+      to: "/app/pos",
+    },
+    {
+      title: "Logout",
+      action: () => authStore.clearUser(),
+      to: "/auth/employeeLogin",
+    },
+  ],
+});
+
+//const currentUserRole = ref(); // admin is 1
+
+//Get sidebar items based on current user role
+
+const sidebarItemsByRole = computed(() => {
+  return sidebarItems.value[authStore.role] || [];
+});
 </script>
 
 <template>
@@ -60,8 +164,24 @@ function toggleMenu() {
         }"
       >
         <div
-          class="bg-bkg-primary w-full rounded-lg shadow dark:shadow-black"
-        ></div>
+          class="bg-bkg-primary w-full flex flex-col items-center justify p-4 rounded-lg shadow dark:shadow-black"
+        >
+          <div
+            v-for="item in sidebarItemsByRole"
+            :key="item.title"
+            class="flex p-6"
+          >
+            <ULink
+              :to="item.to"
+              class="hover:text-primary text-lg font-mono"
+              active-class="text-primary font-bold"
+              inactive-class="text-secondary"
+            >
+              {{ item.title }}</ULink
+            >
+            <UDivider />
+          </div>
+        </div>
       </div>
       <!-- Side menu End -->
 

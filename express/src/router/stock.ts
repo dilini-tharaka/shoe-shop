@@ -451,7 +451,7 @@ stock.post("/", async (req, res) => {
           paid_amount: req.body.paidAmount,
           stock_value: req.body.total,
           Supplier_id: req.body.supplierID,
-          StockManager_id: req.body.stockManagerID || 1, //default stock manager need to be changed
+          StockManager_id: req.body.stockManagerID || 0,
         },
       });
 

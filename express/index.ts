@@ -26,7 +26,7 @@ app.use("/stock", Route.Stock);
 app.use("/searchProduct", Route.SearchProduct);
 
 // Serve static files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(8000, () => {
   console.log("Server is running on port 8000");

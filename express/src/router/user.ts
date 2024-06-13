@@ -253,6 +253,68 @@ user.patch("/:id", async (req, res) => {
         },
       },
     });
+
+    // Update the relevant role-specific table based on the role_id
+    // switch (req.body.role_id) {
+    //   case 1: // Admin
+    //     await prisma.admin.update({
+    //       where: {
+    //         user_id: parseInt(id),
+    //       },
+    //       data: {
+    //         name: name,
+    //         mobile: req.body.mobile,
+    //         nic: req.body.nic,
+    //         email: req.body.email,
+    //         username: req.body.userName,
+    //       },
+    //     });
+    //     break;
+    //   case 2: // Stock Manager
+    //     await prisma.stockmanager.update({
+    //       where: {
+    //         user_id: parseInt(id),
+    //       },
+    //       data: {
+    //         name: name,
+    //         mobile: req.body.mobile,
+    //         nic: req.body.nic,
+    //         email: req.body.email,
+    //         userName: req.body.userName,
+    //       },
+    //     });
+    //     break;
+    //   case 3: // Assistant
+    //     await prisma.assistant.update({
+    //       where: {
+    //         user_id: parseInt(id),
+    //       },
+    //       data: {
+    //         name: name,
+    //         mobile: req.body.mobile,
+    //         nic: req.body.nic,
+    //         email: req.body.email,
+    //         username: req.body.userName,
+    //       },
+    //     });
+    //     break;
+    //   case 4: // Cashier
+    //     await prisma.cashier.update({
+    //       where: {
+    //         user_id: parseInt(id),
+    //       },
+    //       data: {
+    //         name: name,
+    //         mobile: req.body.mobile,
+    //         nic: req.body.nic,
+    //         email: req.body.email,
+    //         userName: req.body.userName,
+    //       },
+    //     });
+    //     break;
+    //   default:
+    //     throw new Error("Invalid role_id");
+    // }
     res.json({
       message: "success",
       data: employee,

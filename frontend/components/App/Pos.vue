@@ -1,5 +1,8 @@
 <script setup>
 import { posSchema } from "~/schema";
+import { useAuthStore } from "~/store";
+
+const authStore = useAuthStore();
 
 const columns = [
   {
@@ -143,7 +146,7 @@ async function print() {
   btnDisabled.value = true;
 
   const printData = ref({
-    Cashier_id: 1, // Need to change
+    Cashier_id: authStore.role, // Need to change
     invoiceitem: purchesedItems.value.map((item) => {
       return {
         id: parseInt(item.id),
@@ -155,7 +158,7 @@ async function print() {
     }),
   });
 
-  console.log(printData.value);
+  //console.log(printData.value);
 
   const { data: addinvoice } = await useFetch("http://localhost:8000/invoice", {
     method: "POST",

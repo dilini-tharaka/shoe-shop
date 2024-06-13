@@ -1,14 +1,50 @@
 <script setup>
 import { employeeLoginSchema } from "~/schema";
+import { useAuthStore } from "~/store";
+
 useHead({
   title: "Employee Login | Shoe Shop",
 });
 
+const authStore = useAuthStore();
 const selected = ref(false);
 
 const form = ref({
   username: "",
   password: "",
+});
+
+// Define roles and their respective sidebar items
+const sidebarPath = ref({
+  1: [
+    // admin is 1
+    {
+      title: "Dashboard",
+      to: "/app/dashboard",
+    }
+  ],
+  2: [
+    //Stock Manager is 2
+    {
+      title: "Dashboard",
+      to: "/app/dashboard",
+    }
+  ],
+
+  3: [
+    //sales Assistant 3
+    {
+      title: "Products",
+      to: "/app/products/add",
+    }
+  ],
+  4: [
+    //cashier is 4
+    {
+      title: "POS",
+      to: "/app/pos",
+    }
+  ],
 });
 
 async function login() {
@@ -21,11 +57,17 @@ async function login() {
   );
 
   // if login success
-  // redirect to dashboard
   if (user.value.data && user.value.message === "success") {
-    //save user data to local storage
+    // Save user data to Pinia store
+    authStore.setUser(user.value.data);
+    //console.log("User data set in store: ", authStore.user);
+    console.log("User role in store: ", authStore.role);
+    // Save user data to localStorage
     localStorage.setItem("user", JSON.stringify(user.value.data));
-    return navigateTo("/app/dashboard");
+
+    // Redirect to dashboard
+    const firstPath = sidebarPath.value[authStore.role][0].to;  // Get the first path of the user role
+    return navigateTo(firstPath);
   }
   if (!user.value.data) {
     form.value.username = "";
