@@ -60,7 +60,8 @@ async function login() {
   // if login success
   if (user.value.data && user.value.message === "success") {
     // Save user data to Pinia store
-    authStore.setUser(user.value.data);
+    const token = 'mock-jwt-token//this is a mock token';
+    authStore.setUser(user.value.data, token);
     //console.log("User data set in store: ", authStore.user);
     console.log("User role in store: ", authStore.role);
     // Save user data to localStorage

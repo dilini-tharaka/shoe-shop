@@ -1,8 +1,10 @@
 <script setup>
 import { useAuthStore } from "~/store";
-// definePageMeta({
-//   middleware: ["auth"]
-// });
+definePageMeta({
+  middleware: ["auth"]
+});
+
+const authStore = useAuthStore();
 
 const isSidebarOpen = ref(true);
 

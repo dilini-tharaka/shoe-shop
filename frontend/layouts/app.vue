@@ -5,7 +5,7 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-
+authStore.checkUser();
 const isSidebarOpen = ref(true);
 
 function toggleMenu() {
