@@ -40,6 +40,7 @@ const form = ref({
   price: 0,
 });
 
+const maxQuantity = ref(0);
 const discountPrecentage = ref(0);
 let btnDisabled = ref(false);
 const paidAmount = ref(0);
@@ -48,6 +49,12 @@ function addItem() {
   //console.log(form.value);
   if (form.value.price === 0) {
     alert("Please click get the details Button first");
+    return;
+  }
+  if(form.value.quantity > maxQuantity.value){
+    alert(`Quantity is more than the stock
+      Available Quantity: ${maxQuantity.value}`
+    );
     return;
   }
   if (form.value.id) {
@@ -106,6 +113,7 @@ async function getValue() {
     form.value.name = data.value.data.name;
     form.value.price = data.value.data.price;
     discountPrecentage.value = data.value.data.discount;
+    maxQuantity.value = data.value.data.quantity;
   } else {
     form.value.id = "";
     return alert(data.value.message);

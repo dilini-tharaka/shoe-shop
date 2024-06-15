@@ -71,7 +71,7 @@ invoice.get("/", async (req, res) => {
 //Get shoe name, selling price , discount using stockdetails id
 invoice.post("/stockdetails", async (req, res) => {
   try {
-    const discount = req.body.discount || 5;
+    const discount = req.body.discount || 5; //default discount 5%
     const { id } = req.body;
     const stockdetails = await prisma.stockdetails.findUnique({
       where: {
@@ -114,6 +114,7 @@ invoice.post("/stockdetails", async (req, res) => {
       name: stockdetails.product.shoeshascolors.shoes.name,
       price: stockdetails.selling_price,
       discount: discount,
+      quantity: stockdetails.qty,
     };
     res.json({
       message: "success",

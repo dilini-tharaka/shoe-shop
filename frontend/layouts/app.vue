@@ -11,6 +11,7 @@ const isSidebarOpen = ref(true);
 function toggleMenu() {
   isSidebarOpen.value = !isSidebarOpen.value;
   //console.log(isSidebarOpen.value);
+  console.log(authStore.role);
 }
 
 // Define roles and their respective sidebar items

@@ -1,5 +1,5 @@
 <script setup>
-const lineChart = {
+const lineChart = ref({
   labels: [
     "January",
     "February",
@@ -17,43 +17,88 @@ const lineChart = {
   datasets: [
     {
       label: "This year",
-      data: [65, 59, 80, 81, 56, 55, 40, 0, 0, 0, 0, 0],
+      data: [],
       fill: false,
       borderColor: "rgb(50, 99, 207)",
       tension: 0.1,
     },
     {
       label: "Previous year",
-      data: [10, 20, 70, 50, 67, 85, 90, 40, 70, 80, 70, 100],
+      data: [],
       fill: false,
       borderColor: "rgb(0, 255, 0)",
       tension: 0.1,
     },
   ],
-};
+});
 
-const barChart = {
-  labels: ["Puma", "Nike", "Adidas", "Reebok", "Under Armour"],
+//Get Monthly Sales by month
+const { data: monthlySales } = await useFetch(
+  "http://localhost:8000/report/monthly"
+);
+
+if (monthlySales.value.data && monthlySales.value.message === "Success") {
+  lineChart.value.datasets[0].data = monthlySales.value.data.currentYear;
+  lineChart.value.datasets[1].data = monthlySales.value.data.previousYear;
+}
+
+const barChart = ref({
+  labels: [],
   datasets: [
     {
       label: "Top 5 Brands",
-      data: [65, 59, 80, 81, 56],
+      data: [],
       backgroundColor: ["#3263cf"],
     },
   ],
-};
+});
 
-const pieChart = {
+
+  try {
+    const { data: topBrands } = await useFetch(
+      "http://localhost:8000/report/topbrand"
+    );
+console.log(topBrands.value.data);
+    if (topBrands.value.data && topBrands.value.message === "Success") {
+      barChart.value.labels = topBrands.value.data.map(
+        (brand) => brand.brand_name
+      );
+      barChart.value.datasets[0].data = topBrands.value.data.map(
+        (brand) => brand.total_sales
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+
+const pieChart = ref({
   datasets: [
     {
-      data: [10, 20, 30, 5],
+      data: [],
       backgroundColor: ["#3263cf", "#7d4094", "#387a60", "#59c9b7"],
     },
   ],
 
-  labels: ["Men", "Women", "Kids", "Sports"],
-};
+  labels: [],
+});
 
+//Get Shoe Sales by Category
+try {
+  const { data: shoeSales } = await useFetch(
+    "http://localhost:8000/report/category"
+  );
+  if (shoeSales.value.data && shoeSales.value.message === "Success") {
+    pieChart.value.labels = shoeSales.value.data.map(
+      (category) => category.category_name
+    );
+    pieChart.value.datasets[0].data = shoeSales.value.data.map(
+      (category) => category.total_sales
+    );
+  }
+} catch (error) {
+  console.log(error);
+}
 //Get Order count
 const orderCount = ref(0);
 
@@ -106,11 +151,11 @@ watch(() => {
       </div>
       <div class="flex w-1/4 bg-slate-200 rounded">
         <div class="flex w-3/5 justify-center items-center">
-      <h1 class="text-blue-600 text-4xl">{{totalOrders}}</h1>
+          <h1 class="text-blue-600 text-4xl">{{ totalOrders }}</h1>
         </div>
         <div class="w-2/5 flex flex-col">
           <span class="uppercase text-lg font-mono">Total </span>
-           <span class="uppercase text-lg font-mono">Orders</span>
+          <span class="uppercase text-lg font-mono">Orders</span>
         </div>
       </div>
     </div>
