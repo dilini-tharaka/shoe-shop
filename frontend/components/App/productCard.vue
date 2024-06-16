@@ -1,7 +1,13 @@
 <script setup>
 const path = "http://localhost:8000/uploads/";
 
-const shoes = ref([]);
+const props = defineProps({
+  products: {
+    type: Array,
+    required: true
+  }
+});
+const shoes = ref(props.products);
 const { data: cardDetails } = useFetch("http://localhost:8000/product/card");
 
 watch(cardDetails, () => {
@@ -36,10 +42,9 @@ const navigateToProduct = (productId) => {
 
 <template>
   <div
-    class="w-80 h-96 flex flex-col rounded bg-bkg-primary shadow-lg dark:shadow-black cursor-pointer"
+    class="w-80 h-96 flex flex-col rounded bg-bkg-primary shadow-lg dark:shadow-black"
     v-for="(shoe, index) in shoes"
     :key="shoe.index"
-    @click="navigateToProduct(shoe.id)"
   >
     <div
       :class="'w-full h-1/2 bg-center bg-cover bg-no-repeat'"
@@ -51,7 +56,6 @@ const navigateToProduct = (productId) => {
         variant="ghost"
         @click="toggleWish(index)"
       />
-     
     </div>
     <div class="flex flex-col gap-2 p-2">
       <h2 class="text-lg font-mono font-bold">{{ shoe.name }}</h2>
@@ -84,6 +88,13 @@ const navigateToProduct = (productId) => {
         <UChip color="green"> <h6>Available</h6></UChip>
         <UChip color="red"> <h6>Out Of Stock</h6></UChip>
       </div>
+      <UButton
+        icon="solar:double-alt-arrow-right-broken"
+        color="primary"
+        variant="outline"
+        @click="navigateToProduct(shoe.id)"
+        block
+      >More Details</UButton>
     </div>
   </div>
 </template>

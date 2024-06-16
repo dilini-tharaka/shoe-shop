@@ -10,7 +10,7 @@
       <slot name="hero"></slot>
     </div>
     <div class="p-3">
-      <div class="w-full flex flex-wrap min-h-screen bg-bkg-primary p-4 gap-3">
+      <div class="w-full flex flex-wrap min-h-screen bg-bkg-primary p-5 gap-10">
         <slot name="content"></slot>
       </div>
     </div>

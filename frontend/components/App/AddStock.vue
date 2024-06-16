@@ -304,7 +304,7 @@ const Columns = [
   },
   {
     key: "sellingPrice",
-    label: "Current Price",
+    label: "Selling Price",
   },
   {
     key: "buyingPrice",
@@ -329,6 +329,7 @@ const items = (row) => [
     {
       label: "More Info",
       icon: "solar:info-circle-broken",
+      click: () => console.log("More Info", row.id),
     },
   ],
   [

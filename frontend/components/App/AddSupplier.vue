@@ -19,6 +19,16 @@ const form = ref({
   branch: "",
   checkedBrands: [],
 });
+
+const bankDetails = ref({
+  bank_name: "",
+  account_owner: "",
+  account_no: "",
+  branch: "",
+});
+
+const availableBrands = ref([]);
+
 // Fetching suppliers from the backend to display in the table
 const Suppliers = ref([]);
 const { data: suppliers } = useFetch("http://localhost:8000/supplier");
@@ -83,6 +93,7 @@ const items = (row) => [
     {
       label: "More Info",
       icon: "solar:info-circle-broken",
+      click: () => moreInfo(row.id),
     },
   ],
   [
@@ -291,6 +302,16 @@ async function addSupplier() {
     return alert("Error: This Email is already registered");
   }
 }
+
+const isopen = ref(false);
+async function moreInfo(supplierID) {
+  isopen.value = true;
+  const {data} = await useFetch(`http://localhost:8000/supplier/${supplierID}`);
+  console.log(data.value);
+  bankDetails.value = data.value.data.bankdetails;
+  availableBrands.value = data.value.data.brands;
+}
+
 </script>
 
 <template>
@@ -333,6 +354,17 @@ async function addSupplier() {
           :total="Suppliers.length"
         />
       </div>
+      <UModal v-model="isopen"> 
+        <h1 class="text-primary font-mono font-bold p-2">More Information</h1>
+        <UCard>
+          <h1>Account Number: {{bankDetails.account_no}}</h1>
+          <h1>Branch: {{bankDetails.branch}}</h1>
+          <h1>Bank Name: {{bankDetails.bank_name}}</h1>
+          <h1>Account Holder: {{bankDetails.account_owner}}</h1>
+          <h1 class="font-mono font-bold p-3">Available Brands</h1>
+          <h1 v-for="b in availableBrands" :key="b.id">{{ b }}</h1>
+        </UCard>
+      </UModal>
     </div>
     <div class="w-full flex flex-col gap-2">
       <UForm :schema="addSupplierSchema" :state="form" @submit="addSupplier">

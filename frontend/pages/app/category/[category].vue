@@ -1,10 +1,12 @@
 <script setup>
-let category = useRoute().params.category;
+const category = ref(useRoute().params.category);
+console.log(category.value);
 
 useHead({
-  title: `${category} | E-commerce`,
+  title: `${category.value} | E-commerce`,
 });
 // console.log(category);
+
 </script>
 
 <template>

@@ -160,10 +160,37 @@ supplier.get("/:id", async (req, res) => {
       where: {
         id: parseInt(id),
       },
+      include: {
+        bankdetails: true,
+        supplierhasbrands: {
+          include: {
+            brand: true,
+          },
+        },
+      },
     });
+
+    if (!supplier) {
+      return res.json({
+        message: "Supplier not found",
+      });
+    }
+    const result = {
+      id: supplier.id,
+      name: supplier.name,
+      email: supplier.email,
+      mobile: supplier.mobile,
+      nic: supplier.nic,
+      address: supplier.address,
+      bankdetails: supplier.bankdetails,
+      brands: supplier.supplierhasbrands.map((supplierhasbrand) => {
+        return supplierhasbrand.brand.name;
+      }),
+    };
+
     res.json({
       message: "success",
-      data: supplier,
+      data: result,
     });
   } catch (error: any) {
     res.json({
