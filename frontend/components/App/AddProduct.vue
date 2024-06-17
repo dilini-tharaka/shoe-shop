@@ -156,6 +156,7 @@ const items = (row) => [
     {
       label: "More Info",
       icon: "solar:info-circle-broken",
+      click: () => moreInfo(row),
     },
   ],
   [
@@ -434,7 +435,7 @@ async function addProduct() {
 
     console.log(data.data.value);
 
-    if(data.data.value.data === "Product already exists"){
+    if (data.data.value.data === "Product already exists") {
       alert("Product already exists");
       form.value = {
         size: 0,
@@ -513,6 +514,22 @@ function addBrand() {
 function addName() {
   isName.value = true;
 }
+
+const isOpen = ref(false);
+const moreInformation = ref({
+  barcode: "",
+  length: "",
+  buying_price: 0,
+  category: "",
+  qty: 0,
+});
+
+async function moreInfo(raw) {
+  isOpen.value = true;
+  const { data } = await useFetch(`http://localhost:8000/product/${raw.id}`);
+  moreInformation.value = data.value.data;
+  console.log(moreInformation.value);
+}
 </script>
 
 <template>
@@ -554,6 +571,16 @@ function addName() {
           :total="shoe.length"
         />
       </div>
+      <UModal v-model="isOpen">
+        <h1 class="text-primary font-mono font-bold p-2">More Information</h1>
+        <UCard>
+          <h1>Barcode: {{ moreInformation.barcode }}</h1>
+          <h1>Length: {{ moreInformation.length }}</h1>
+          <h1>Buying Price: {{ moreInformation.buying_price }}</h1>
+          <h1>Category: {{ moreInformation.category }}</h1>
+          <h1>Available Quantity: {{ moreInformation.qty }}</h1>
+        </UCard>
+      </UModal>
     </div>
 
     <div class="w-full flex flex-col px-3 pb-3">

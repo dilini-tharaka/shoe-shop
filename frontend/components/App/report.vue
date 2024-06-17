@@ -53,24 +53,22 @@ const barChart = ref({
   ],
 });
 
-
-  try {
-    const { data: topBrands } = await useFetch(
-      "http://localhost:8000/report/topbrand"
+try {
+  const { data: topBrands } = await useFetch(
+    "http://localhost:8000/report/topbrand"
+  );
+  console.log(topBrands.value.data);
+  if (topBrands.value.data && topBrands.value.message === "Success") {
+    barChart.value.labels = topBrands.value.data.map(
+      (brand) => brand.brand_name
     );
-console.log(topBrands.value.data);
-    if (topBrands.value.data && topBrands.value.message === "Success") {
-      barChart.value.labels = topBrands.value.data.map(
-        (brand) => brand.brand_name
-      );
-      barChart.value.datasets[0].data = topBrands.value.data.map(
-        (brand) => brand.total_sales
-      );
-    }
-  } catch (error) {
-    console.log(error);
+    barChart.value.datasets[0].data = topBrands.value.data.map(
+      (brand) => brand.total_sales
+    );
   }
-
+} catch (error) {
+  console.log(error);
+}
 
 const pieChart = ref({
   datasets: [
@@ -107,13 +105,22 @@ onMounted(async () => {
   orderCount.value = order.value.data;
 });
 
-//Get Revenue
+//Get Revenue for the last 7 days
 const revenue = ref(0);
 onMounted(async () => {
   const { data: revenueData } = await useFetch(
     "http://localhost:8000/report/revenue"
   );
   revenue.value = parseFloat(revenueData.value.data).toFixed(2);
+});
+
+//Get Revenue for the last 30 days
+const revenue30 = ref(0);
+onMounted(async () => {
+  const { data: revenueData } = await useFetch(
+    "http://localhost:8000/report/revenue30"
+  );
+  revenue30.value = parseFloat(revenueData.value.data).toFixed(2);
 });
 
 //Get Total Orders
@@ -126,6 +133,40 @@ onMounted(async () => {
 });
 watch(() => {
   console.log(orderCount.value);
+});
+
+const products = ref([]);
+//Get Top 5 Selling Products
+const columns = [
+  {
+    key: "p_id",
+    label: "P_ID",
+  },
+  {
+    key: "name",
+    label: "Name",
+  },
+  {
+    key: "brand",
+    label: "Brand",
+  },
+  {
+    key: "selling_price",
+    label: "Selling Price(LKR)",
+  },
+  {
+    key: "quantity_sold",
+    label: "Total Sales",
+  },
+];
+
+onMounted(async () => {
+  const { data: topProducts } = await useFetch(
+    "http://localhost:8000/report/topshoe"
+  );
+  if (topProducts.value.data && topProducts.value.message === "Success") {
+    products.value = topProducts.value.data;
+  }
 });
 </script>
 <template>
@@ -147,6 +188,15 @@ watch(() => {
         <div class="w-2/5">
           <h1 class="uppercase text-lg font-mono">Revenue</h1>
           <h1 class="font-bold">Last 7 days</h1>
+        </div>
+      </div>
+      <div class="flex w-1/4 bg-slate-200 rounded">
+        <div class="flex w-3/5 justify-center items-center">
+          <h1 class="text-blue-600 text-xl">LKR {{ revenue30 }}</h1>
+        </div>
+        <div class="w-2/5">
+          <h1 class="uppercase text-lg font-mono">Revenue</h1>
+          <h1 class="font-bold">Last 30 days</h1>
         </div>
       </div>
       <div class="flex w-1/4 bg-slate-200 rounded">
@@ -191,7 +241,10 @@ watch(() => {
           class="w-full h-full"
         />
       </div>
-      <div class="flex flex-col w-1/2 h-full"></div>
+      <div class="flex flex-col w-1/2 h-full">
+        <h1 class="text-lg font-mono">Top 5 Selling Products of the Month</h1>
+        <UTable :columns="columns" :rows="products"></UTable>
+      </div>
     </div>
   </div>
 </template>

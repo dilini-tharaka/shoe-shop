@@ -1,4 +1,6 @@
 <script setup>
+import { color } from "chart.js/helpers";
+import { mapStores } from "pinia";
 import { getProductSchema } from "~/schema";
 import { addItemSchema } from "~/schema";
 import { addStockSchema } from "~/schema";
@@ -7,13 +9,13 @@ import { useAuthStore } from "~/store";
 const authStore = useAuthStore();
 
 // Filter
-const filterOption = ["Filter Option", "Brand", "ID", "Name"];
+const filterOption = ["Filter Option", "Brand", "S_ItemID", "Name"];
 const selected = ref(filterOption[0]);
 const searchedValue = ref("");
 
 //search stock using product ID, brand, name
 async function search() {
-  if (selected.value === "ID") {
+  if (selected.value === "S_ItemID") {
     const { data: stock } = await useFetch(
       `http://localhost:8000/stock/${searchedValue.value}`
     );
@@ -329,7 +331,7 @@ const items = (row) => [
     {
       label: "More Info",
       icon: "solar:info-circle-broken",
-      click: () => console.log("More Info", row.id),
+      click: () => moreInfo(row),
     },
   ],
   [
@@ -495,6 +497,30 @@ async function addStock() {
       paidAmount: 0,
     };
     btnDisabled.value = false;
+  }
+}
+//More information about the stock
+const isopen = ref(false);
+const moreInfomation = ref({
+  id: 0,
+  barcode: 0,
+  product: {
+    color: "",
+    size: "",
+    category: "",
+  },
+});
+
+async function moreInfo(row) {
+  isopen.value = true;
+  const { data } = await useFetch(`http://localhost:8000/stock/${row.id}`);
+  //console.log(data.value.data);
+
+  // Extracting specific fields
+  if (data.value.data && data.value.message === "success") {
+    // const { id, barcode, product } = data.value.data[0];
+    // const { color, size, category } = product;
+    moreInfomation.value = data.value.data[0];
   }
 }
 </script>
@@ -679,6 +705,16 @@ async function addStock() {
           :total="stockDetails.length"
         />
       </div>
+      <UModal v-model="isopen">
+        <h1 class="text-primary font-mono font-bold p-2">More Information</h1>
+        <UCard>
+          <h1>Stock_Id: {{ moreInfomation.id }}</h1>
+          <h1>Barcode: {{ moreInfomation.barcode }}</h1>
+          <h1>Size: {{ moreInfomation.product.size }}</h1>
+          <h1>Color: {{ moreInfomation.product.color }}</h1>
+          <h1>Category: {{ moreInfomation.product.category }}</h1>
+        </UCard>
+      </UModal>
     </div>
   </div>
 </template>

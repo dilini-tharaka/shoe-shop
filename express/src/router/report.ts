@@ -70,6 +70,40 @@ report.get("/revenue", async (req, res) => {
   }
 });
 
+//Get last 30 days Revenue
+report.get("/revenue30", async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0); // Set to the start of the day
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to the end of the day
+
+    const revenue = await prisma.invoiceitem.aggregate({
+      _sum: {
+        total: true,
+      },
+      where: {
+        invoice: {
+          Invoice_at: {
+            gte: thirtyDaysAgo,
+            lte: today,
+          },
+        },
+      },
+    });
+    res.json({
+      message: "Success",
+      data: revenue._sum.total,
+    });
+  } catch (error: any) {
+    res.json({
+      message: "Error",
+      data: error.message,
+    });
+  }
+});
 //Get total order count
 report.get("/total", async (req, res) => {
   try {
@@ -108,9 +142,11 @@ report.get("/topbrand", async (req, res) => {
         JOIN 
             stockdetails sd ON ii.StockDetails_id = sd.id
         JOIN 
-            product p ON sd.Product_id = p.id
+           product p ON sd.Product_id = p.id
+        JOIN
+           shoeshasColors shc ON p.Shoes_id = shc.id
         JOIN 
-            shoes s ON p.Shoes_id = s.id
+           shoes s ON shc.Shoes_id = s.id
         JOIN 
             brand b ON s.brand_id = b.id
             WHERE i.Invoice_at >= ${thirtyDaysAgo} AND i.Invoice_at <= ${today}
@@ -151,8 +187,10 @@ report.get("/category", async (req, res) => {
         stockdetails sd ON ii.StockDetails_id = sd.id
       JOIN 
         product p ON sd.Product_id = p.id
+      JOIN
+        shoeshasColors shco ON p.Shoes_id = shco.id
       JOIN 
-        shoes s ON p.Shoes_id = s.id
+        shoes s ON shco.Shoes_id = s.id
       JOIN 
         shoeshascategory shc ON s.id = shc.Shoes_id
       JOIN 
@@ -179,18 +217,17 @@ report.get("/category", async (req, res) => {
 //Get Monthly selling by month over the year
 report.get("/monthly", async (req, res) => {
   try {
-    
     const currentYear = new Date().getFullYear();
     const previousYear = currentYear - 1;
 
-     // Define the type for the query result
-     type SalesResult = {
+    // Define the type for the query result
+    type SalesResult = {
       month: number;
       total_sales: number;
     };
     // Helper function to get sales data by month for a given year
-    const getSalesDataByYear = async (year:number) => {
-      const result:SalesResult[] = await prisma.$queryRaw`
+    const getSalesDataByYear = async (year: number) => {
+      const result: SalesResult[] = await prisma.$queryRaw`
         SELECT 
           MONTH(i.Invoice_at) AS month,
           SUM(ii.total) AS total_sales
@@ -208,8 +245,8 @@ report.get("/monthly", async (req, res) => {
 
       // Initialize an array with 12 months filled with 0
       const salesData = Array(12).fill(0);
-      result.forEach(row => {
-        salesData[row.month - 1] = row.total_sales; 
+      result.forEach((row) => {
+        salesData[row.month - 1] = row.total_sales;
       });
 
       return salesData;
@@ -223,8 +260,59 @@ report.get("/monthly", async (req, res) => {
       message: "Success",
       data: {
         currentYear: currentYearData,
-        previousYear: previousYearData
-      }
+        previousYear: previousYearData,
+      },
+    });
+  } catch (error: any) {
+    res.json({
+      message: "Error",
+      data: error.message,
+    });
+  }
+});
+
+//Get top 5 selling shoes of the month
+report.get("/topshoe", async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0); // Set to the start of the day
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to the end of the day
+
+    const topShoe = await prisma.$queryRaw`
+    SELECT 
+        p.id AS p_id,
+        b.name AS brand,
+        s.name AS name,
+        SUM(ii.qty) AS quantity_sold,
+        sd.selling_price AS selling_price
+      FROM 
+        invoiceitem ii
+      JOIN 
+        invoice i ON ii.Invoice_id = i.id
+      JOIN 
+        stockdetails sd ON ii.StockDetails_id = sd.id
+      JOIN 
+        product p ON sd.Product_id = p.id
+      JOIN
+        shoeshasColors shc ON p.Shoes_id = shc.id
+      JOIN 
+        shoes s ON shc.Shoes_id = s.id
+      JOIN 
+        brand b ON s.brand_id = b.id
+      WHERE 
+        i.Invoice_at BETWEEN ${thirtyDaysAgo} AND ${today}
+      GROUP BY 
+        p.id, b.name, s.name, sd.selling_price
+      ORDER BY 
+        quantity_sold DESC
+      LIMIT 5;`;
+
+    res.json({
+      message: "Success",
+      data: topShoe,
     });
   } catch (error: any) {
     res.json({

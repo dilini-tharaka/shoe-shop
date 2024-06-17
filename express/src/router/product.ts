@@ -383,6 +383,7 @@ product.get("/", async (req, res) => {
 
       return {
         id: product.id,
+
         size: product.sizes.size,
         length: product.sizes.length,
         color: product.shoeshascolors.colors.name,
@@ -596,6 +597,7 @@ product.get("/:id", async (req, res) => {
     //format data
     const result = {
       id: product.id,
+      selling_count: product.selling_count,
       size: product.sizes.size,
       length: product.sizes.length,
       color: product.shoeshascolors.colors.name,

@@ -5,7 +5,7 @@ export const useAuthStore = defineStore("auth", {
     user: null,
     role: 0, // Store the user role
     isLoggedIn: false,
-    token: null,
+    token: "",
   }),
 
   actions: {
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore("auth", {
       this.user = null;
       this.role = 0;
       this.isLoggedIn = false;
-      this.token = null;
+      this.token = "";
 
       // Clear from localStorage
       localStorage.removeItem("user");

@@ -234,7 +234,7 @@ stock.get("/:id", async (req, res) => {
         qty: {
           gt: 0, //get only products with quantity greater than 0
         },
-        Product_id: id,
+        id: id,
       },
       include: {
         product: {
