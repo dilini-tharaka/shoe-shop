@@ -1,5 +1,20 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
+
+const receiptsDir = path.join(__dirname, 'receipts');
+// Ensure 'receipts' directory exists
+if (!fs.existsSync(receiptsDir)) {
+  try {
+    fs.mkdirSync(receiptsDir);
+    console.log(`Created directory: ${receiptsDir}`);
+  } catch (err) {
+    console.error(`Error creating directory: ${receiptsDir}`, err);
+    throw err; // Handle or throw the error as needed
+  }
+}
 
 const invoice = express.Router();
 const prisma = new PrismaClient();
@@ -111,6 +126,7 @@ invoice.post("/stockdetails", async (req, res) => {
     }
 
     const stockdetailsData = {
+      p_id: stockdetails.Product_id,
       name: stockdetails.product.shoeshascolors.shoes.name,
       price: stockdetails.selling_price,
       discount: discount,
@@ -249,6 +265,25 @@ invoice.post("/", async (req, res) => {
 
       await Promise.all(stockUpdates);
       await Promise.all(productUpdates);
+
+      // Generate PDF receipt
+      const doc = new PDFDocument();
+      const fileName = `invoice_${newInvoice.id}.pdf`;
+      const filePath = path.join(receiptsDir, fileName);
+      const writeStream = fs.createWriteStream(filePath);
+      doc.pipe(writeStream);
+
+      doc.fontSize(25).text(`Receipt #${newInvoice.id}`, { align: "center" });
+      doc.text(`Cashier: ${newInvoice.Cashier_id}`);//100,120
+      doc.text(`Date: ${newInvoice.Invoice_at}`,100,160);//100,160
+      doc.moveDown();
+      invoiceItems.forEach((item: any) => {
+        doc.text(`Item ID: ${item.StockDetails_id}, Quantity: ${item.qty}, Total: ${item.amount}`);
+      });
+
+      const totalAmount = invoiceItems.reduce((acc: number, item: any) => acc + item.amount, 0);
+      doc.text(`Total Amount: ${totalAmount}`,{ align: "right" });
+      doc.end();
       return newInvoice;
     });
 

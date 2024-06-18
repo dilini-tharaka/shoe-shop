@@ -51,10 +51,9 @@ function addItem() {
     alert("Please click get the details Button first");
     return;
   }
-  if(form.value.quantity > maxQuantity.value){
+  if (form.value.quantity > maxQuantity.value) {
     alert(`Quantity is more than the stock
-      Available Quantity: ${maxQuantity.value}`
-    );
+      Available Quantity: ${maxQuantity.value}`);
     return;
   }
   if (form.value.id) {
@@ -75,15 +74,17 @@ function addItem() {
       return;
     }
   }
-  const newItem = {
+
+  const newItem = ref({
     id: form.value.id,
+    p_id: productID.value,
     name: form.value.name,
     quantity: form.value.quantity,
     price: form.value.price,
     amount: form.value.price * form.value.quantity,
-  };
+  });
 
-  purchesedItems.value.push(newItem);
+  purchesedItems.value.push(newItem.value);
   //console.log(purchesedItems);
   form.value = {
     id: "",
@@ -93,6 +94,7 @@ function addItem() {
   };
 }
 
+const productID = ref(0);
 // Get Shoe name,Price and discount
 async function getValue() {
   if (form.value.id === "") {
@@ -112,6 +114,7 @@ async function getValue() {
   if (data.value && data.value.message === "success") {
     form.value.name = data.value.data.name;
     form.value.price = data.value.data.price;
+    productID.value = data.value.data.p_id;
     discountPrecentage.value = data.value.data.discount;
     maxQuantity.value = data.value.data.quantity;
   } else {
@@ -154,14 +157,13 @@ async function print() {
   btnDisabled.value = true;
 
   const printData = ref({
-    Cashier_id: authStore.user.id, 
+    Cashier_id: authStore.user.id,
     invoiceitem: purchesedItems.value.map((item) => {
       return {
         id: parseInt(item.id),
+        p_id: parseInt(item.p_id),
         qty: parseInt(item.quantity),
-        amount: parseFloat(
-          item.amount * (1 - discountPrecentage.value / 100)
-        ),
+        amount: parseFloat(item.amount * (1 - discountPrecentage.value / 100)),
       };
     }),
   });
@@ -190,6 +192,7 @@ async function print() {
     btnDisabled.value = false;
     paidAmount.value = 0;
     discountPrecentage.value = 0;
+    productID.value = 0;
   } else {
     console.log(addinvoice.value.data);
     alert("Invoice Adding Failed");
